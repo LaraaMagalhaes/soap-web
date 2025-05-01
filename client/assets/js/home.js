@@ -105,3 +105,11 @@ botaoReposicao.addEventListener('click', () => {
   window.location.href = '/escolha.html';
 });
 
+
+
+const botaoPerfil = document.getElementById('botao-perfil');
+
+botaoPerfil.addEventListener('click', () => {
+  window.location.href = '/perfil.html';
+});
+
