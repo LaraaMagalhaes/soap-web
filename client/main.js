@@ -17,7 +17,7 @@ const usuariosValidos = [
   
       if (usuarioValido) {
         erroDiv.style.display = 'none';
-        window.location.href = '/pages/home/home.html';
+        window.location.href = '/public/home.html';
       } else {
         erroDiv.style.display = 'block';
       }

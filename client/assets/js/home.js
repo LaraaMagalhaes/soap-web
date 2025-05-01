@@ -98,9 +98,10 @@ function preencherFormulario(index) {
   mensagemStatus.textContent = ''; // limpa a mensagem ao trocar de pessoa
 }
 
-// ✅ NOVO: redirecionamento para escolha.html ao clicar no botão de reposição
+//redirecionamento para escolha.html ao clicar no botão de reposição
 const botaoReposicao = document.getElementById('botao-reposicao');
 
 botaoReposicao.addEventListener('click', () => {
-  window.location.href = '../escolha/escolha.html';
+  window.location.href = '/escolha.html';
 });
+
