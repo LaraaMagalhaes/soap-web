@@ -4,7 +4,7 @@ const registros = [
     horario: "08:30",
     bloco: "Bloco A",
     tarefa: "Limpeza Banheiros",
-    descricao: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem..."
+    descricao: "Descrição da Maria Antônia de Freitas"
   },
   {
     nome: "José da Silva Sales",
