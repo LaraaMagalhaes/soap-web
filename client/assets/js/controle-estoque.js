@@ -74,7 +74,7 @@ filtroCategoria.addEventListener('change', aplicarFiltros);
 
 // Voltar
 document.getElementById('botao-voltar').addEventListener('click', () => {
-    window.location.href = '/home-gerente.html';
+    window.location.href = 'home-gerente.html';
 });
 
 // Inicialização

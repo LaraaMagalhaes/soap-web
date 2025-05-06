@@ -104,22 +104,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const botaoReposicao = document.getElementById('botao-reposicao');
 
   botaoReposicao.addEventListener('click', () => {
-    window.location.href = '/escolha-gerente.html';
+    window.location.href = 'escolha-gerente.html';
   });
 
   const botaoPerfil = document.getElementById('botao-perfil');
 
   botaoPerfil.addEventListener('click', () => {
-    window.location.href = '/perfil.html';
+    window.location.href = 'perfil-gerente.html';
   });
  
   document.getElementById('link-estoque')
-    .addEventListener('click', () => window.location.href = '/controle-estoque.html');
+    .addEventListener('click', () => window.location.href = 'controle-estoque.html');
 
   document.getElementById('link-historico')
-    .addEventListener('click', () => window.location.href = '/historico-semanal.html');
+    .addEventListener('click', () => window.location.href = 'historico.html');
 
   document.getElementById('link-tarefas')
-    .addEventListener('click', () => window.location.href = '/delegacao-tarefas.html');
+    .addEventListener('click', () => window.location.href = 'delegacao_tarefas.html');
 
 });

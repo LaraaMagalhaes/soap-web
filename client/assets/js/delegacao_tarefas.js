@@ -46,13 +46,26 @@ function getMonthName(monthIndex) {
 function addDayClickEvents() {
   document.querySelectorAll(".day-cell").forEach((cell) => {
     cell.addEventListener("click", () => {
+      // Marcar como selecionado
       document.querySelectorAll(".day-cell").forEach((c) =>
         c.classList.remove("selected")
       );
       cell.classList.add("selected");
+
+      // Obter dia, mês e ano selecionados
+      const selectedDay = cell.getAttribute("data-day").padStart(2, "0");
+      const selectedMonth = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+      const selectedYear = currentDate.getFullYear();
+
+      const dataFormatada = `${selectedDay}/${selectedMonth}/${selectedYear}`;
+
+      // Redirecionar para delegacao_home com a data
+      window.location.href = `delegacao_home.html?data=${dataFormatada}`;
     });
   });
 }
+
+
 
 prevBtn.addEventListener("click", () => {
   currentDate.setMonth(currentDate.getMonth() - 1);

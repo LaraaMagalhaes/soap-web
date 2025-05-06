@@ -115,7 +115,7 @@ renderizarProdutos(produtos);
 const botaoVoltar = document.getElementById('botao-voltar');
 if (botaoVoltar) {
   botaoVoltar.addEventListener('click', () => {
-    window.location.href = '/home-gerente.html';
+    window.location.href = 'home-gerente.html';
   });
 }
 
