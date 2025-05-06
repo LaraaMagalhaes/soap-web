@@ -1,7 +1,7 @@
 const selecionados = new Set();
 
 // Produtos simulados vindos do "banco"
-const produtos = [
+let produtos = JSON.parse(localStorage.getItem('produtos')) || [
   { nome: "Rodo", imagem: "../assets/images/rodo.jpg", unidades: 15 },
   { nome: "Desinfetante", imagem: "../assets/images/desinfetante.png", unidades: 15 },
   { nome: "Álcool", imagem: "../assets/images/alcool.png", unidades: 15 },
@@ -20,13 +20,14 @@ function renderizarProdutos(lista) {
   lista.forEach(produto => {
     const col = document.createElement('div');
     col.className = 'col-6 col-md-3';
+    const quantidadeSalva = localStorage.getItem(`quantidade-${produto.nome}`) || produto.unidades;
 
     col.innerHTML = `
       <div class="product-card" data-produto="${produto.nome}">
         <img src="${produto.imagem}" class="product-img" alt="${produto.nome}">
         <div class="d-flex justify-content-center align-items-center gap-2">
           <div class="product-name m-0">${produto.nome}</div>
-          <div class="product-qty m-0">${produto.unidades}und</div>
+          <input type="number" class="product-qty-input" value="${quantidadeSalva}" data-produto="${produto.nome}" min="0">
         </div>
       </div>
     `;
@@ -35,6 +36,21 @@ function renderizarProdutos(lista) {
   });
 
   ativarSelecao();
+  ativarEdicaoQuantidade();
+}
+
+function ativarEdicaoQuantidade() {
+  const inputs = document.querySelectorAll('.product-qty-input');
+  
+  inputs.forEach(input => {
+    input.addEventListener('change', () => {
+      const produto = input.getAttribute('data-produto');
+      const novaQuantidade = input.value;
+
+      // Salva no localStorage com uma chave única para cada produto
+      localStorage.setItem(`quantidade-${produto}`, novaQuantidade);
+    });
+  });
 }
 
 // Permite selecionar/deselecionar os produtos
@@ -99,7 +115,7 @@ renderizarProdutos(produtos);
 const botaoVoltar = document.getElementById('botao-voltar');
 if (botaoVoltar) {
   botaoVoltar.addEventListener('click', () => {
-    window.location.href = '/home.html';
+    window.location.href = '/home-gerente.html';
   });
 }
 

@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
       horario: "08:30",
       bloco: "Bloco A",
       tarefa: "Limpeza Banheiros",
-      descricao: "Descrição da Maria Antônia de Freitas"
+      descricao: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem..."
     },
     {
       nome: "José da Silva Sales",
@@ -56,8 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const tituloTarefa = document.getElementById('titulo-tarefa');
   const mensagemStatus = document.getElementById('mensagem-status');
 
+  // Preenche os campos com os dados iniciais
   preencherFormulario(0);
 
+  // Atualiza o formulário ao clicar em um card
   scheduleCards.forEach(card => {
     card.addEventListener('click', () => {
       const index = parseInt(card.getAttribute('data-id'));
@@ -65,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Atualiza a descrição e exibe mensagem na tela
   botaoEnviar.addEventListener('click', (event) => {
     event.preventDefault();
 
@@ -83,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Atualiza os campos do formulário com os dados do array
   function preencherFormulario(index) {
     const pessoa = registros[index];
     indiceAtual = index;
@@ -93,17 +97,29 @@ document.addEventListener('DOMContentLoaded', () => {
     textareaDescricao.value = pessoa.descricao;
     tituloTarefa.textContent = pessoa.tarefa;
 
-    mensagemStatus.textContent = '';
+    mensagemStatus.textContent = ''; // limpa a mensagem ao trocar de pessoa
   }
 
+  //redirecionamento para escolha.html ao clicar no botão de reposição
   const botaoReposicao = document.getElementById('botao-reposicao');
-  botaoReposicao?.addEventListener('click', () => {
-    window.location.href = '/escolha.html';
+
+  botaoReposicao.addEventListener('click', () => {
+    window.location.href = '/escolha-gerente.html';
   });
 
   const botaoPerfil = document.getElementById('botao-perfil');
-  botaoPerfil?.addEventListener('click', () => {
+
+  botaoPerfil.addEventListener('click', () => {
     window.location.href = '/perfil.html';
   });
+ 
+  document.getElementById('link-estoque')
+    .addEventListener('click', () => window.location.href = '/controle-estoque.html');
+
+  document.getElementById('link-historico')
+    .addEventListener('click', () => window.location.href = '/historico-semanal.html');
+
+  document.getElementById('link-tarefas')
+    .addEventListener('click', () => window.location.href = '/delegacao-tarefas.html');
 
 });
