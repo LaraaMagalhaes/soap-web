@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home - Limpeza</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/home.gerente.css">
+</head>
+<body>
+
+<!-- Top bar / Navbar -->
+<div class="nav-bar">
+  <!-- ✨ LINKS ADICIONADOS -->
+  <a href="#" class="nav-link" id="link-estoque">Controle de Estoque</a>
+  <a href="#" class="nav-link" id="link-historico">Histórico Semanal</a>
+  <a href="#" class="nav-link" id="link-tarefas">Delegação de Tarefas</a>
+
+  <!-- Ícone de usuário continua, mas com “ms-auto” para grudar na direita -->
+  <div class="user-icon ms-auto" id="botao-perfil">
+    <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" alt="User" width="20">
+  </div>
+</div>
+
+
+  <!-- Container principal -->
+  <div class="main-wrapper">
+    <div class="main-container">
+
+      <!-- Lista lateral esquerda -->
+      <div class="w-100 w-md-50">
+        <div class="card card-full-height">
+          <div class="date-header">25/04/2025</div>
+          <div class="p-2 overflow-auto">
+
+            <!-- Cards com layout dividido -->
+            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="0">
+              <div class="fw-bold text-primary">08:30</div>
+              <div class="text-center flex-fill px-2">Maria Antônia de Freitas</div>
+              <div class="text-end text-muted">Bloco A</div>
+            </div>
+
+            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="1">
+              <div class="fw-bold text-primary">08:30</div>
+              <div class="text-center flex-fill px-2">José da Silva Sales</div>
+              <div class="text-end text-muted">Bloco B</div>
+            </div>
+
+            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="2">
+              <div class="fw-bold text-primary">08:30</div>
+              <div class="text-center flex-fill px-2">Francisco de Assis Nunes</div>
+              <div class="text-end text-muted">Bloco C</div>
+            </div>
+
+            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="3">
+              <div class="fw-bold text-primary">08:30</div>
+              <div class="text-center flex-fill px-2">Julia Maria Torres</div>
+              <div class="text-end text-muted">Bloco D</div>
+            </div>
+
+            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="4">
+              <div class="fw-bold text-primary">15:30</div>
+              <div class="text-center flex-fill px-2">Adalberto Santos Magalhães</div>
+              <div class="text-end text-muted">Bloco E</div>
+            </div>
+
+            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="5">
+              <div class="fw-bold text-primary">15:30</div>
+              <div class="text-center flex-fill px-2">José da Silva Sales</div>
+              <div class="text-end text-muted">Bloco B</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalhes à direita -->
+      <div class="w-100 w-md-50">
+        <div class="card card-full-height">
+        <div id="titulo-tarefa" class="section-title">Limpeza Banheiros</div>
+          <div class="card-body">
+            <form>
+              <div class="mb-2">
+                <input type="text" class="form-control" value="Maria Antônia de Freitas" readonly>
+              </div>
+              <div class="d-flex gap-2 mb-2">
+                <input type="text" class="form-control" value="08:30" readonly>
+                <input type="text" class="form-control" value="Bloco A" readonly>
+              </div>
+              <label class="form-label">Descrição</label>
+              <textarea class="form-control mb-3" rows="5">
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium...
+              </textarea>
+
+              <div class="d-grid gap-2 mb-2">
+                <button id="botao-reposicao" type="button" class="btn btn-outline-secondary">Algum produto precisa ser reposto??</button>
+              </div>
+
+              <div class="d-grid">
+                <button type="button" class="btn btn-primary">Enviar</button>
+              </div>
+              <!-- Adicione abaixo do botão "Enviar" -->
+              <div id="mensagem-status" class="mt-2 text-success"></div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/home-gerente.js"></script>
+</body>
+</html>
