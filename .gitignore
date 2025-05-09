@@ -1,2 +1,4 @@
 # Ignorar o .env do back-end
 server/.env
+server/node_modules
+
