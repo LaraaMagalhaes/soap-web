@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const funcionarioSchema = new mongoose.Schema({
+const adminSchema = new mongoose.Schema({
     name: {type:String, required:true},
     cargo: {type:String, required:true},
     matricula: {type:String, required:true, unique:true},
@@ -9,4 +9,4 @@ const funcionarioSchema = new mongoose.Schema({
 });
 
 
-export default mongoose.model('Funcionario', funcionarioSchema);
+export default mongoose.model('Admin', adminSchema);
