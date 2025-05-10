@@ -1,13 +1,36 @@
-let produtos = JSON.parse(localStorage.getItem('produtos')) || [
-    { nome: "Rodo", imagem: "../assets/images/rodo.jpg", unidades: 15, categoria: "Utensílios de Limpeza" },
-    { nome: "Desinfetante", imagem: "../assets/images/desinfetante.png", unidades: 15, categoria: "Produtos Químicos" },
-    { nome: "Álcool", imagem: "../assets/images/alcool.png", unidades: 15, categoria: "Produtos Químicos" },
-    { nome: "Vassoura", imagem: "../assets/images/vassoura.png", unidades: 15, categoria: "Utensílios de Limpeza" },
-    { nome: "Baldes", imagem: "../assets/images/balde.png", unidades: 10, categoria: "Utensílios de Limpeza" },
-    { nome: "Panos", imagem: "../assets/images/pano.jpg", unidades: 20, categoria: "Materiais de Limpeza" },
-    { nome: "Limpa Vidros", imagem: "../assets/images/limpa-vidros.png", unidades: 5, categoria: "Produtos Químicos" },
-    { nome: "Sacos de Lixo", imagem: "../assets/images/saco-de-lixo.jpeg", unidades: 30, categoria: "Descartáveis" }
-];
+// let produtos = JSON.parse(localStorage.getItem('produtos')) || [
+//     { nome: "Rodo", imagem: "../assets/images/rodo.jpg", unidades: 15, categoria: "Utensílios de Limpeza" },
+//     { nome: "Desinfetante", imagem: "../assets/images/desinfetante.png", unidades: 15, categoria: "Produtos Químicos" },
+//     { nome: "Álcool", imagem: "../assets/images/alcool.png", unidades: 15, categoria: "Produtos Químicos" },
+//     { nome: "Vassoura", imagem: "../assets/images/vassoura.png", unidades: 15, categoria: "Utensílios de Limpeza" },
+//     { nome: "Baldes", imagem: "../assets/images/balde.png", unidades: 10, categoria: "Utensílios de Limpeza" },
+//     { nome: "Panos", imagem: "../assets/images/pano.jpg", unidades: 20, categoria: "Materiais de Limpeza" },
+//     { nome: "Limpa Vidros", imagem: "../assets/images/limpa-vidros.png", unidades: 5, categoria: "Produtos Químicos" },
+//     { nome: "Sacos de Lixo", imagem: "../assets/images/saco-de-lixo.jpeg", unidades: 30, categoria: "Descartáveis" }
+// ];
+
+let produtos = []
+
+async function carregarProdutos() {
+    try{
+        const res = await fetch('http://localhost:3000/api/produtos/listarProudutos')
+        const dados = await res.json();
+        produtos = dados.map( p => ({
+            nome: p.name,
+            imagem: "../assets/images/noimage.png",
+            unidades: p.estoque,
+            categoria: p.categoria
+        }));
+
+        preencherCategorias();
+        renderizarProdutos(produtos);
+        ativarEdicaoQuantidade();
+    } catch (error){
+        console.log('Erro ao carregar produtos: ', error);
+    }
+}
+
+carregarProdutos();
 
 
 // 🧠 atualiza quantidades com localStorage (se houver)
@@ -140,38 +163,31 @@ function atualizarSelectCategoria() {
     });
 }
 
-formProduto.addEventListener('submit', (e) => {
-    e.preventDefault();
+// formProduto.addEventListener('submit', (e) => {
+//     e.preventDefault();
 
-    const nome = document.getElementById('input-nome').value.trim();
-    const categoria = document.getElementById('input-categoria').value;
-    const unidades = parseInt(document.getElementById('input-unidades').value);
-    const imagemInput = document.getElementById('input-imagem');
+//     const nome = document.getElementById('input-nome').value.trim();
+//     const categoria = document.getElementById('input-categoria').value;
+//     const unidades = parseInt(document.getElementById('input-unidades').value);
+//     const imagemInput = document.getElementById('input-imagem');
 
-    if (!nome || !categoria || !unidades || unidades <= 0) {
-        alert('Preencha todos os campos corretamente.');
-        return;
-    }
+//     if (!nome || !categoria || !unidades || unidades <= 0) {
+//         alert('Preencha todos os campos corretamente.');
+//         return;
+//     }
 
-    let imagemURL = "../assets/images/padrao.png"; // caso o usuário não envie imagem
+//     let imagemURL = "../assets/images/noimage.png"; // caso o usuário não envie imagem
 
-    if (imagemInput.files && imagemInput.files[0]) {
-        imagemURL = URL.createObjectURL(imagemInput.files[0]);
-    }
+//     if (imagemInput.files && imagemInput.files[0]) {
+//         imagemURL = URL.createObjectURL(imagemInput.files[0]);
+//     }
 
-    produtos.push({
-        nome,
-        imagem: imagemURL,
-        unidades,
-        categoria
-    });
-
-    // Atualiza localStorage com a nova lista
-    localStorage.setItem('produtos', JSON.stringify(produtos));
-
-
-    modal.style.display = 'none';
-    formProduto.reset();
-    renderizarProdutos(produtos);
-});
+//     try{
+//         const res = await fetch('http://localhost:3000/api/produtos/criarProduto', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ name: nome, estoque: unidades })
+//         }
+//     });
+// });
 
