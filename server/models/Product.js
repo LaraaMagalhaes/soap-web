@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
-    name: {type:String, required:true},
-    estoque: {type:Number, required:true}
+    nome: {type:String, required:true},
+    imagem: {type:String, required:false},
+    unidades: {type:Number, required:true},
+    categoria: {type:String, required:true}
 });
 
 
-export default mongoose.model('Produtos', productSchema);
+
+module.exports =  mongoose.model('Produtos', productSchema);

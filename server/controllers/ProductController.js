@@ -10,13 +10,17 @@ export const listarProdutos = async (req, res) => {
 }
 
 export const criarProduto = async (req, res) => {
-    const { name, estoque } = req.body;
+    const { nome, unidades, categoria } = req.body;
+    const imagem = req.file ? `uploads/${req.file.filename}` : `client/assets/images/noimage.png`;
+
     const novoProduto = new Product({
-        name,
-        estoque
+        nome,
+        imagem,
+        unidades,
+        categoria
     });
 
-    const produto = await Product.findOne({ name });
+    const produto = await Product.findOne({ nome });
         if (produto) {
             return res.status(400).json({ message: "Produto já cadastrado" });
         }

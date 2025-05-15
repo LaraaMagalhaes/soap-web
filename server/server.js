@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database.js';
+import path from 'path';
 
 // Importando as rotas
 import funcionarioRoute from './routes/FuncionarioRoute.js';
@@ -15,6 +16,7 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join('..assets/images/uploads')));
 
 
 // Rota raiz
