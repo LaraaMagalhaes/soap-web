@@ -1,20 +1,45 @@
-let produtos = JSON.parse(localStorage.getItem('produtos')) || [
-    { nome: "Rodo", imagem: "../assets/images/rodo.jpg", unidades: 15, categoria: "Utensílios de Limpeza" },
-    { nome: "Desinfetante", imagem: "../assets/images/desinfetante.png", unidades: 15, categoria: "Produtos Químicos" },
-    { nome: "Álcool", imagem: "../assets/images/alcool.png", unidades: 15, categoria: "Produtos Químicos" },
-    { nome: "Vassoura", imagem: "../assets/images/vassoura.png", unidades: 15, categoria: "Utensílios de Limpeza" },
-    { nome: "Baldes", imagem: "../assets/images/balde.png", unidades: 10, categoria: "Utensílios de Limpeza" },
-    { nome: "Panos", imagem: "../assets/images/pano.jpg", unidades: 20, categoria: "Materiais de Limpeza" },
-    { nome: "Limpa Vidros", imagem: "../assets/images/limpa-vidros.png", unidades: 5, categoria: "Produtos Químicos" },
-    { nome: "Sacos de Lixo", imagem: "../assets/images/saco-de-lixo.jpeg", unidades: 30, categoria: "Descartáveis" }
+let produtos_categoria = JSON.parse(localStorage.getItem('produtos')) || [
+    { categoria: "Utensílios de Limpeza" },
+    { categoria: "Materiais de Limpeza" },
+    { categoria: "Produtos Químicos" },
+    { categoria: "Descartáveis" },
+    { categoria: "Outros" },
 ];
+
+let produtos = []
+
+async function carregarProdutos() {
+    try{
+        const res = await fetch('http://localhost:3000/api/produtos/listarProdutos')
+        const dados = await res.json();
+        console.log(dados);
+        produtos = dados.map( p => ({
+            _id: p._id,
+            nome: p.nome.toUpperCase(),
+            imagem: `../assets/images/${p.imagem || 'noimage.png'}`,
+            unidades: p.unidades,
+            categoria: p.categoria
+        }));
+
+        console.log("pós map");
+        console.log(produtos);
+
+        preencherCategorias();
+        renderizarProdutos(produtos);
+        ativarEdicaoQuantidade();
+    } catch (error){
+        console.log('Erro ao carregar produtos: ', error);
+    }
+}
+
+carregarProdutos();
 
 
 // 🧠 atualiza quantidades com localStorage (se houver)
-produtos = produtos.map(p => {
-    const local = localStorage.getItem(`quantidade-${p.nome}`);
-    return { ...p, unidades: local !== null ? Number(local) : p.unidades };
-});
+// produtos = produtos.map(p => {
+//     const local = localStorage.getItem(`quantidade-${p.nome}`);
+//     return { ...p, unidades: local !== null ? Number(local) : p.unidades };
+// });
 
 const campoPesquisa = document.getElementById('pesquisa');
 const filtroCategoria = document.getElementById('filtro-categoria');
@@ -33,7 +58,7 @@ function renderizarProdutos(lista) {
                 
                 <div class="d-flex align-items-center gap-2 mt-2">
                 <input type="number" class="form-control form-control-sm input-estoque text-center" 
-                    value="${prod.unidades}" data-produto="${prod.nome}" min="0" style="width: 60px;">
+                    value="${Number.isFinite(prod.unidades) ? prod.unidades : 0}" data-id="${prod._id}" data-produto="${prod.nome}" min="0" style="width: 60px;">
                 <span>und</span>
                 </div>
 
@@ -86,7 +111,7 @@ function ativarEdicaoQuantidade() {
     const inputs = document.querySelectorAll('.input-estoque');
 
     inputs.forEach(input => {
-        input.addEventListener('change', () => {
+        input.addEventListener('change', async () => {
             const nome = input.getAttribute('data-produto');
             const novaQtd = parseInt(input.value);
 
@@ -103,11 +128,29 @@ function ativarEdicaoQuantidade() {
                 return p;
             });
 
-            // Atualiza quantidade individual
-            localStorage.setItem(`quantidade-${nome}`, novaQtd);
+            const produtoEncontrado = produtos.find(p => p.nome === nome);
 
-            // Atualiza a lista completa
-            localStorage.setItem('produtos', JSON.stringify(produtos));
+            if( produtoEncontrado ) {
+                try{
+                    const id = input.getAttribute('data-id');
+                    await fetch(`http://localhost:3000/api/produtos/atualizarProduto/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ unidades: novaQtd })
+                    });
+
+                    alert('Estoque atualizado com sucesso!');
+                    carregarProdutos();
+
+                } catch (error) {
+                    console.error('Erro ao atualizar estoque:', error);
+                    alert('Erro na requisição. Tente novamente.');
+                }
+            }
+            // // Atualiza quantidade individual
+            // localStorage.setItem(`quantidade-${nome}`, novaQtd);
+            // // Atualiza a lista completa
+            // localStorage.setItem('produtos', JSON.stringify(produtos));
         });
     });
 }
@@ -131,7 +174,7 @@ fecharModal.addEventListener('click', () => {
 function atualizarSelectCategoria() {
     const select = document.getElementById('input-categoria');
     select.innerHTML = '<option value="">Selecione uma categoria</option>';
-    const categoriasUnicas = [...new Set(produtos.map(p => p.categoria))];
+    const categoriasUnicas = [...new Set(produtos_categoria.map(p => p.categoria))];
     categoriasUnicas.forEach(cat => {
         const opt = document.createElement('option');
         opt.value = cat;
@@ -140,7 +183,7 @@ function atualizarSelectCategoria() {
     });
 }
 
-formProduto.addEventListener('submit', (e) => {
+formProduto.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const nome = document.getElementById('input-nome').value.trim();
@@ -148,30 +191,43 @@ formProduto.addEventListener('submit', (e) => {
     const unidades = parseInt(document.getElementById('input-unidades').value);
     const imagemInput = document.getElementById('input-imagem');
 
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('categoria', categoria);
+    formData.append('unidades', unidades);
+
     if (!nome || !categoria || !unidades || unidades <= 0) {
         alert('Preencha todos os campos corretamente.');
         return;
     }
 
-    let imagemURL = "../assets/images/padrao.png"; // caso o usuário não envie imagem
+    let imagemURL = "../assets/images/noimage.png"; // caso o usuário não envie imagem
 
     if (imagemInput.files && imagemInput.files[0]) {
-        imagemURL = URL.createObjectURL(imagemInput.files[0]);
+        formData.append('imagem', imagemInput.files[0]);
+        // imagemURL = URL.createObjectURL(imagemInput.files[0]);
     }
 
-    produtos.push({
-        nome,
-        imagem: imagemURL,
-        unidades,
-        categoria
-    });
+    try{
+        const res = await fetch('http://localhost:3000/api/produtos/criarProduto', {
+            method: 'POST',
+            body: formData
+        });
 
-    // Atualiza localStorage com a nova lista
-    localStorage.setItem('produtos', JSON.stringify(produtos));
+        console.log(res);
+        if(!res.ok) {
+            const erro = await res.json();
+            alert(`Erro ao criar produto: ${erro.message}`);
+            return;
+        }
 
+        alert('Produto cadastrado com sucesso!');
+        modal.style.display = 'none';
+        formProduto.reset();
+        carregarProdutos(); // Atualiza a lista de produtos
 
-    modal.style.display = 'none';
-    formProduto.reset();
-    renderizarProdutos(produtos);
+    } catch (error) {
+        console.error('Erro ao cadastrar produto:', error);
+        alert('Erro na requisição. Tente novamente.');
+    }
 });
-

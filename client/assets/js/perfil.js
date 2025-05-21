@@ -33,6 +33,4 @@ botaoSolicitarSenha.addEventListener('click', () => {
     mensagemEmail.textContent = `Um e-mail de redefinição foi enviado para ${usuarioLogado.email}`;
     mensagemEmail.style.display = 'block';
   }
-});
-
-  
+}); 
