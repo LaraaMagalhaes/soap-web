@@ -15,9 +15,9 @@ async function carregarProdutos() {
         console.log(dados);
         produtos = dados.map( p => ({
             _id: p._id,
-            nome: p.nome.toUpperCase(),
-            imagem: `../assets/images/${p.imagem || 'noimage.png'}`,
-            unidades: p.unidades,
+            nome: p.nome,
+            imagem: `../assets/images/noimage.png`,
+            estoque: p.estoque,
             categoria: p.categoria
         }));
 
@@ -34,12 +34,6 @@ async function carregarProdutos() {
 
 carregarProdutos();
 
-
-// 🧠 atualiza quantidades com localStorage (se houver)
-// produtos = produtos.map(p => {
-//     const local = localStorage.getItem(`quantidade-${p.nome}`);
-//     return { ...p, unidades: local !== null ? Number(local) : p.unidades };
-// });
 
 const campoPesquisa = document.getElementById('pesquisa');
 const filtroCategoria = document.getElementById('filtro-categoria');
@@ -58,7 +52,7 @@ function renderizarProdutos(lista) {
                 
                 <div class="d-flex align-items-center gap-2 mt-2">
                 <input type="number" class="form-control form-control-sm input-estoque text-center" 
-                    value="${Number.isFinite(prod.unidades) ? prod.unidades : 0}" data-id="${prod._id}" data-produto="${prod.nome}" min="0" style="width: 60px;">
+                    value="${Number.isFinite(prod.estoque) ? prod.estoque : 0}" data-id="${prod._id}" data-produto="${prod.nome}" min="0" style="width: 60px;">
                 <span>und</span>
                 </div>
 
@@ -112,7 +106,7 @@ function ativarEdicaoQuantidade() {
 
     inputs.forEach(input => {
         input.addEventListener('change', async () => {
-            const nome = input.getAttribute('data-produto');
+            const id = input.getAttribute('data-id');
             const novaQtd = parseInt(input.value);
 
             if (isNaN(novaQtd) || novaQtd < 0) {
@@ -122,21 +116,20 @@ function ativarEdicaoQuantidade() {
 
             // Atualiza no array principal
             produtos = produtos.map(p => {
-                if (p.nome === nome) {
-                    p.unidades = novaQtd;
+                if (p._id === id) {
+                    p.estoque = novaQtd;
                 }
                 return p;
             });
 
-            const produtoEncontrado = produtos.find(p => p.nome === nome);
+            const produtoEncontrado = produtos.find(p => p._id === id);
 
             if( produtoEncontrado ) {
                 try{
-                    const id = input.getAttribute('data-id');
                     await fetch(`http://localhost:3000/api/produtos/atualizarProduto/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ unidades: novaQtd })
+                        body: JSON.stringify({ estoque: novaQtd })
                     });
 
                     alert('Estoque atualizado com sucesso!');
@@ -147,10 +140,6 @@ function ativarEdicaoQuantidade() {
                     alert('Erro na requisição. Tente novamente.');
                 }
             }
-            // // Atualiza quantidade individual
-            // localStorage.setItem(`quantidade-${nome}`, novaQtd);
-            // // Atualiza a lista completa
-            // localStorage.setItem('produtos', JSON.stringify(produtos));
         });
     });
 }
@@ -191,15 +180,17 @@ formProduto.addEventListener('submit', async (e) => {
     const unidades = parseInt(document.getElementById('input-unidades').value);
     const imagemInput = document.getElementById('input-imagem');
 
-    const formData = new FormData();
-    formData.append('nome', nome);
-    formData.append('categoria', categoria);
-    formData.append('unidades', unidades);
+    // const formData = new FormData();
+    // formData.append('nome', nome);
+    // formData.append('categoria', categoria);
+    // formData.append('unidades', unidades);
 
     if (!nome || !categoria || !unidades || unidades <= 0) {
         alert('Preencha todos os campos corretamente.');
         return;
     }
+
+
 
     let imagemURL = "../assets/images/noimage.png"; // caso o usuário não envie imagem
 
@@ -209,9 +200,14 @@ formProduto.addEventListener('submit', async (e) => {
     }
 
     try{
-        const res = await fetch('http://localhost:3000/api/produtos/criarProduto', {
+        const res = await fetch(`http://localhost:3000/api/produtos/criarProduto`, {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                nome: nome,
+                estoque: unidades,
+                categoria: categoria
+             })
         });
 
         console.log(res);

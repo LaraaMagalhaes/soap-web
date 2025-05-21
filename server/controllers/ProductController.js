@@ -10,13 +10,12 @@ export const listarProdutos = async (req, res) => {
 }
 
 export const criarProduto = async (req, res) => {
-    const { nome, unidades, categoria } = req.body;
-    const imagem = req.file ? `uploads/${req.file.filename}` : `client/assets/images/noimage.png`;
+    const { nome, imagem, estoque, categoria } = req.body;
 
     const novoProduto = new Product({
         nome,
         imagem,
-        unidades,
+        estoque,
         categoria
     });
 
