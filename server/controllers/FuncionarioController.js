@@ -1,4 +1,28 @@
 import Funcionario from '../models/Funcionario.js';
+import { hashSenha, verificarSenha } from '../utils/bcrypt.js';
+import { gerarToken } from '../utils/jwt.js';
+
+export const login = async (req, res) => {
+    const { matricula, senha } = req.body;
+
+    try{
+        const funcionario = await Funcionario.findOne({ matricula });
+        if (!funcionario) return res.status(404).json({ message: 'Funcionário não encontrado' });
+
+        const senhaValida = await verificarSenha(senha, funcionario.senha);
+        if (!senhaValida) return res.status(401).json({ message: 'Senha inválida' });
+
+        const token = gerarToken(funcionario);
+        res.json({ token, funcionario: {
+            id: funcionario._id, 
+            nome: funcionario.nome, 
+            cargo: funcionario.cargo, 
+            matricula: funcionario.matricula } 
+        });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro no login', err:JSON.stringify(err) });
+    }
+}
 
 export const listarFuncionarios = async (req, res) => { 
     const funcionarios = await Funcionario.find();
@@ -10,14 +34,16 @@ export const listarFuncionarios = async (req, res) => {
 }
 
 export const criarFuncionario = async (req, res) => {
-
     const {nome, cargo, matricula, email, senha} = req.body;
+
+    const senhaHash = await hashSenha(senha); // Criptografando a senha
+
     const novoFuncionario = new Funcionario({
         nome,
         cargo,
         matricula,
         email,
-        senha
+        senha:senhaHash
     });
 
     const matriculaExistente = await Funcionario.findOne({ matricula });
@@ -48,9 +74,16 @@ export const obterFuncionario = async (req, res) => {
 }
 
 export const atualizarFuncionario = async (req, res) => {
-    const { id } = req.params;
+    const { nome, cargo, matricula, email, senha } = req.body;
+    const senhaHash = await hashSenha(senha);
+
     try {
-        const funcionario = await Funcionario.findByIdAndUpdate(id, req.body, { new: true });
+        const funcionario = await Funcionario.findByIdAndUpdate(
+            req.params._id,
+            { nome, cargo, matricula, email, senha:senhaHash },
+            { new: true }
+        );
+
         if (!funcionario) {
             return res.status(404).json({ message: 'Funcionário não encontrado' });
         }

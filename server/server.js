@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database.js';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 
 // Importando as rotas
 import funcionarioRoute from './routes/FuncionarioRoute.js';
@@ -17,8 +18,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join('..assets/images/uploads')));
+app.use(cookieParser());
 
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}))
 
+// https:///share/682e9bf4-c600-8006-a821-01a733db945b
 // Rota raiz
 app.get('/', (req, res) => {
     res.send('API SOAP-web');

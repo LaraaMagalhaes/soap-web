@@ -1,4 +1,5 @@
 import express from 'express';
+import { autenticarToken } from '../middlewares/authMiddleware.js';
 
 import {
     listarFuncionarios,
@@ -10,9 +11,9 @@ import {
 
 const router = express.Router();
 
-router.get('/listarFuncionarios', listarFuncionarios);
+router.get('/listarFuncionarios', autenticarToken, listarFuncionarios);
 router.post('/criarFuncionario', criarFuncionario);
-router.get('/obterFuncionario/:id', obterFuncionario);
+router.get('/obterFuncionario/:id', autenticarToken, obterFuncionario);
 router.put('/atualizarFuncionario/:id', atualizarFuncionario);
 router.delete('/deletarFuncionario/:id', deletarFuncionario);
 
