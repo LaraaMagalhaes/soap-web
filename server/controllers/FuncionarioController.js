@@ -11,13 +11,13 @@ export const listarFuncionarios = async (req, res) => {
 
 export const criarFuncionario = async (req, res) => {
 
-    const {name, cargo, matricula, email, password} = req.body;
+    const {nome, cargo, matricula, email, senha} = req.body;
     const novoFuncionario = new Funcionario({
-        name,
+        nome,
         cargo,
         matricula,
         email,
-        password
+        senha
     });
 
     const matriculaExistente = await Funcionario.findOne({ matricula });

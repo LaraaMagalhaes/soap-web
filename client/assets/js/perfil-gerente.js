@@ -1,47 +1,4 @@
-const usuarios = [
-  {
-    nome: "Anna Lara Magalhães Monteiro Vieira",
-    matricula: "2223889-2",
-    funcao: "Secretária",
-    email: "annalarammv123@gmail.com",
-    senha: "********************"
-  },
-  {
-    nome: "Maria Antonia de Freitas",
-    matricula: "2245387-2",
-    funcao: "Faxineira",
-    email: "mariafreitas@gmail.com",
-    senha: "********"
-  },
-  {
-    nome: "José da Silva Sales",
-    matricula: "7572787-2",
-    funcao: "Faxineiro",
-    email: "josesales@gmail.com",
-    senha: "********"
-  },
-  {
-    nome: "Francisco de Assis Nunes",
-    matricula: "7527277-2",
-    funcao: "Zelador",
-    email: "franciscanunes@gmail.com",
-    senha: "********"
-  },
-  {
-    nome: "Julia Maria Torres",
-    matricula: "892542-2",
-    funcao: "Secretária",
-    email: "juliatorres@gmail.com",
-    senha: "********"
-  },
-  {
-    nome: "Adalberto Santos",
-    matricula: "225693-2",
-    funcao: "Gerente",
-    email: "adalberto.santos@gmail.com",
-    senha: "********"
-  }
-];
+let usuarios = [];
 
 window.addEventListener('DOMContentLoaded', () => {
   preencherPainel(usuarios[0]);
@@ -61,28 +18,93 @@ document.getElementById('fechar-modal-usuario').addEventListener('click', () => 
   document.getElementById('modal-usuario').style.display = 'none';
 });
 
-// Submissão do formulário de cadastro
-document.getElementById('form-usuario').addEventListener('submit', (e) => {
+// Submissão do formulário de cadastro do funcionário
+document.getElementById('form-usuario').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const nome = document.getElementById('nome-usuario').value.trim();
-  const funcao = document.getElementById('ocupacao-usuario').value;
+  const cargo = document.getElementById('ocupacao-usuario').value;
   const email = document.getElementById('email-usuario').value.trim();
   const matricula = document.getElementById('matricula-usuario').value.trim();
   const senha = document.getElementById('senha-usuario').value;
   const fotoInput = document.getElementById('foto-usuario');
 
-  let imagemURL = "../assets/images/padrao.png";
-  if (fotoInput.files?.[0]) {
-    imagemURL = URL.createObjectURL(fotoInput.files[0]);
+  if (!nome || !cargo || !email || !matricula || !senha) {
+    alert("Preencha todos os campos obrigatórios.");
+    return;
   }
 
-  usuarios.push({ nome, funcao, email, matricula, senha, imagem: imagemURL });
+  if (usuarios.some(u => u.matricula === matricula)) {
+    alert("Matrícula já cadastrada.");
+    return;
+  }
+
+  try{
+    const res = await fetch('http://localhost:3000/api/funcionarios/criarFuncionario', {
+      method: 'POST',
+      headers: { 'Content-Type' : 'application/json' },
+      body: JSON.stringify({
+        nome,
+        cargo,
+        matricula,
+        email,
+        senha
+      })
+    });
+
+    if (!res.ok) {
+      const erro = await res.json();
+      console.error(erro);
+      alert(`Erro ao criar funcionario: ${erro.message}`);
+      return;
+    }
+    alert('Funcionário cadastrado com sucesso!');
+
+  } catch (error) {
+    console.error('Erro ao cadastrar funcionário:', error);
+    alert('Erro ao cadastrar funcionário. Tente novamente.');
+  }
+
+  // let imagemURL = "../assets/images/noimage.png";
+  // if (fotoInput.files?.[0]) {
+  //   imagemURL = URL.createObjectURL(fotoInput.files[0]);
+  // }
+  // usuarios.push({ nome, cargo, email, matricula, senha, imagem: imagemURL });
 
   renderizarListaUsuarios();
   document.getElementById('modal-usuario').style.display = 'none';
   e.target.reset();
 });
+
+
+// Atualiza a lista de usuários
+async function buscarFuncionarios() {
+
+  try {
+    const res = await fetch('http://localhost:3000/api/funcionarios/listarFuncionarios');
+    const funcionarios = await res.json();
+    console.log(funcionarios);
+
+    usuarios = funcionarios.map(funcionario => ({
+      _id: funcionario._id,
+      nome: funcionario.nome,
+      matricula: funcionario.matricula,
+      cargo: funcionario.cargo,
+      email: funcionario.email,
+      senha: funcionario.senha
+    }));
+
+    console.log("pós map");
+    console.log(usuarios);
+    renderizarListaUsuarios();
+
+  }
+  catch (error) {
+    console.error('Erro ao buscar funcionários:', error);
+  }
+}
+
+buscarFuncionarios();
 
 // Lista de usuários e busca
 function renderizarListaUsuarios(filtro = "") {
@@ -117,7 +139,7 @@ function preencherPainel(usuario) {
   document.getElementById('senha').textContent = usuario.senha;
 
   const btnSenha = document.getElementById('btn-solicitar-senha');
-  if (usuario.funcao.toLowerCase() === 'gerente') {
+  if (usuario.cargo.toLowerCase() === 'gerente') {
     btnSenha.style.display = 'block';
   } else {
     btnSenha.style.display = 'none';
