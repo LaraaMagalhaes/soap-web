@@ -26,9 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const data = await res.json();
+      console.log(data)
+      localStorage.setItem("token", data.token)
+
       const tipoUsuario = data.funcionario.cargo?.toLowerCase();
+      
 
       erroDiv.style.display = 'none';
+
 
       if (tipoUsuario === 'gerente') {
         window.location.href = '/public/home-gerente.html';

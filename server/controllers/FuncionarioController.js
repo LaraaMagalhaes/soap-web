@@ -118,6 +118,28 @@ export const atualizarFuncionario = async (req, res) => {
     }
 }
 
+export const atualizarSenha = async (req, res) => {
+    const { senha } = req.body;
+    const senhaHash = await hashSenha(senha);
+
+    console.log(req.params)
+
+    try {
+        const funcionario = await Funcionario.findByIdAndUpdate(
+            req.params._id,
+            { senha: senhaHash },
+            { new: false }
+        );
+
+        if (!funcionario) {
+            return res.status(404).json({ message: 'Funcionário não encontrado' });
+        }
+        res.status(200).json(funcionario);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 export const deletarFuncionario = async (req, res) => {
     const { id } = req.params;
     try {

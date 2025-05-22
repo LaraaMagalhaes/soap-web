@@ -170,13 +170,7 @@ async function carregarPerfilGerente() {
     }
     
     const dados = await res.json();
-    const usuario = dados.map(funcionario => ({
-      _id: funcionario._id,
-      nome: funcionario.nome,
-      matricula: funcionario.matricula,
-      cargo: funcionario.cargo,
-      email: funcionario.email
-    }));
+    const usuario = dados.funcionario;
     preencherPainel(usuario)
 
   } catch (error) {

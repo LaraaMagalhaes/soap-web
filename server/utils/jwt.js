@@ -13,7 +13,6 @@ export const gerarToken = (usuario) => {
         email: usuario.email
     }
 
-
     return jwt.sign(
         payload,
         process.env.JWT_SECRET,

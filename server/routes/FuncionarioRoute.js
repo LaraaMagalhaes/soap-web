@@ -9,7 +9,8 @@ import {
     criarFuncionario,
     obterFuncionario,
     atualizarFuncionario,
-    deletarFuncionario
+    deletarFuncionario,
+    atualizarSenha
 } from '../controllers/FuncionarioController.js';
 
 const router = express.Router();
@@ -18,11 +19,14 @@ const router = express.Router();
 router.post('/login', login);
 router.post('/logout', logout)
 
+
 router.get('/listarFuncionarios', autenticarToken, listarFuncionarios);
 router.post('/criarFuncionario', autenticarToken, criarFuncionario);
 router.get('/obterFuncionario', autenticarToken, obterFuncionario);
-router.put('/atualizarFuncionario/:id', atualizarFuncionario);
-router.delete('/deletarFuncionario/:id', deletarFuncionario);
+router.put('/atualizarFuncionario/:_id', atualizarFuncionario);
+router.delete('/deletarFuncionario/:_id', deletarFuncionario);
+
+router.put('/atualizarSenha/:_id', atualizarSenha);
 
 router.use((req, res) => {
     res.status(404).json({
