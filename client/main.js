@@ -1,33 +1,47 @@
-const usuariosValidos = [
-  { matricula: '123', senha: '123', tipo: 'usuario' },
-  { matricula: '321', senha: '321', tipo: 'gerente' }
-];
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('loginForm');
-    const erroDiv = document.getElementById('erroLogin');
-  
-    form.addEventListener('submit', function(event) {
-      event.preventDefault();
-  
-      const matricula = document.getElementById('matricula').value;
-      const senha = document.getElementById('senha').value;
-  
-      const usuarioValido = usuariosValidos.find(user => user.matricula === matricula && user.senha === senha);
-  
-      if (usuarioValido) {
-        erroDiv.style.display = 'none';
-        
-        localStorage.setItem('tipoUsuario', usuarioValido.tipo);
-  
-        if (usuarioValido.tipo === 'gerente') {
-          window.location.href = '/public/home-gerente.html';
-        } else {
-          window.location.href = '/public/home.html';
-        }
-  
-      } else {
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('loginForm');
+  const erroDiv = document.getElementById('erroLogin');
+
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const matricula = document.getElementById('matricula').value;
+    const senha = document.getElementById('senha').value;
+    const botao = form.querySelector('button[type="submit"]');
+
+    botao.disabled = true;
+
+    try {
+
+      const res = await fetch('http://localhost:3000/api/funcionarios/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ matricula, senha })
+      });
+
+      if (!res.ok) {
         erroDiv.style.display = 'block';
+        return
       }
-    });
+
+      const data = await res.json();
+      const tipoUsuario = data.funcionario.cargo?.toLowerCase();
+
+      erroDiv.style.display = 'none';
+
+      if (tipoUsuario === 'gerente') {
+        window.location.href = '/public/home-gerente.html';
+      } else {
+        window.location.href = '/public/home.html';
+      }
+
+    } catch (error){
+      console.error('Erro no login: ', error)
+      erroDiv.style.display = 'block';
+      botao.disabled = false;
+    }
+
+    
   });
+});

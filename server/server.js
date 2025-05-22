@@ -15,17 +15,19 @@ import productRoute from './routes/ProductRouter.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use('/uploads', express.static(path.join('..assets/images/uploads')));
-app.use(cookieParser());
 
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true,
 }))
 
-// https:///share/682e9bf4-c600-8006-a821-01a733db945b
+app.use(express.json());
+app.use('/uploads', express.static(path.join('..assets/images/uploads')));
+app.use(cookieParser());
+
+
+
+
 // Rota raiz
 app.get('/', (req, res) => {
     res.send('API SOAP-web');
@@ -52,7 +54,7 @@ app.use((req, res) => {
     caminho: req.originalUrl
   });
 });
-  
+
 connectDB();
 
 app.listen(process.env.PORT, () => {

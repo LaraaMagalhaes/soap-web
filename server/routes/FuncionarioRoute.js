@@ -1,7 +1,10 @@
 import express from 'express';
 import { autenticarToken } from '../middlewares/authMiddleware.js';
 
+
 import {
+    login,
+    logout,
     listarFuncionarios,
     criarFuncionario,
     obterFuncionario,
@@ -11,9 +14,13 @@ import {
 
 const router = express.Router();
 
+// Rotas protegidas
+router.post('/login', login);
+router.post('/logout', logout)
+
 router.get('/listarFuncionarios', autenticarToken, listarFuncionarios);
-router.post('/criarFuncionario', criarFuncionario);
-router.get('/obterFuncionario/:id', autenticarToken, obterFuncionario);
+router.post('/criarFuncionario', autenticarToken, criarFuncionario);
+router.get('/obterFuncionario', autenticarToken, obterFuncionario);
 router.put('/atualizarFuncionario/:id', atualizarFuncionario);
 router.delete('/deletarFuncionario/:id', deletarFuncionario);
 

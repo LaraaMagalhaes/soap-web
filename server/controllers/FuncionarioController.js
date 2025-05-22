@@ -1,11 +1,12 @@
 import Funcionario from '../models/Funcionario.js';
+import jwt, { decode } from 'jsonwebtoken'
 import { hashSenha, verificarSenha } from '../utils/bcrypt.js';
 import { gerarToken } from '../utils/jwt.js';
 
 export const login = async (req, res) => {
     const { matricula, senha } = req.body;
 
-    try{
+    try {
         const funcionario = await Funcionario.findOne({ matricula });
         if (!funcionario) return res.status(404).json({ message: 'Funcionário não encontrado' });
 
@@ -13,18 +14,39 @@ export const login = async (req, res) => {
         if (!senhaValida) return res.status(401).json({ message: 'Senha inválida' });
 
         const token = gerarToken(funcionario);
-        res.json({ token, funcionario: {
-            id: funcionario._id, 
-            nome: funcionario.nome, 
-            cargo: funcionario.cargo, 
-            matricula: funcionario.matricula } 
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            maxAge: 60 * 60 * 1000
+        })
+
+        res.json({
+            token, funcionario: {
+                id: funcionario._id,
+                nome: funcionario.nome,
+                cargo: funcionario.cargo,
+                matricula: funcionario.matricula
+            }
         });
     } catch (error) {
-        res.status(500).json({ erro: 'Erro no login', err:JSON.stringify(err) });
+        res.status(500).json({ erro: 'Erro no login', err: error.message });
     }
 }
 
-export const listarFuncionarios = async (req, res) => { 
+export const logout = (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict'
+    });
+
+    res.status(200).json({ message: 'Logout realizado com sucesso' })
+
+}
+
+export const listarFuncionarios = async (req, res) => {
     const funcionarios = await Funcionario.find();
     try {
         res.status(200).json(funcionarios);
@@ -34,7 +56,7 @@ export const listarFuncionarios = async (req, res) => {
 }
 
 export const criarFuncionario = async (req, res) => {
-    const {nome, cargo, matricula, email, senha} = req.body;
+    const { nome, cargo, matricula, email, senha } = req.body;
 
     const senhaHash = await hashSenha(senha); // Criptografando a senha
 
@@ -43,7 +65,7 @@ export const criarFuncionario = async (req, res) => {
         cargo,
         matricula,
         email,
-        senha:senhaHash
+        senha: senhaHash
     });
 
     const matriculaExistente = await Funcionario.findOne({ matricula });
@@ -61,15 +83,18 @@ export const criarFuncionario = async (req, res) => {
 }
 
 export const obterFuncionario = async (req, res) => {
-    const { id } = req.params;
     try {
-        const funcionario = await Funcionario.findById(id);
+        const funcionario = await Funcionario.findById(req.usuario._id).select('-senha');
+
         if (!funcionario) {
             return res.status(404).json({ message: 'Funcionário não encontrado' });
         }
-        res.status(200).json(funcionario);
+
+        res.json({funcionario})
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Erro ao buscar perfil: ', error);
+        res.status(401).json({ message: 'Token Inválido ou Expirado' })
     }
 }
 
@@ -80,7 +105,7 @@ export const atualizarFuncionario = async (req, res) => {
     try {
         const funcionario = await Funcionario.findByIdAndUpdate(
             req.params._id,
-            { nome, cargo, matricula, email, senha:senhaHash },
+            { nome, cargo, matricula, email, senha: senhaHash },
             { new: true }
         );
 
