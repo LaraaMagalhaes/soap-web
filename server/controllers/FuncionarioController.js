@@ -43,7 +43,6 @@ export const logout = (req, res) => {
     });
 
     res.status(200).json({ message: 'Logout realizado com sucesso' })
-
 }
 
 export const listarFuncionarios = async (req, res) => {

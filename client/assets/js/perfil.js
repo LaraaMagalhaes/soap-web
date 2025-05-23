@@ -1,36 +1,56 @@
-// Simulando dados recebidos do backend
-const usuarioLogado = {
-    nome: "Maria Antonia de Freitas",
-    matricula: "2245387-2",
-    funcao: "Faxineira",
-    email: "MariaAntonia123@gmail.com",
-    senha: "********************"
-  };
-  
-  // Preenchendo os campos da tela com os dados do usuário
-  window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('nome').textContent = usuarioLogado.nome;
-    document.getElementById('matricula').textContent = usuarioLogado.matricula;
-    document.getElementById('funcao').textContent = usuarioLogado.funcao;
-    document.getElementById('email').textContent = usuarioLogado.email;
-    document.getElementById('senha').textContent = usuarioLogado.senha;
-  });
-  
-  // Evento para voltar à home
-  const voltarBtn = document.getElementById('voltar-home');
-  if (voltarBtn) {
-    voltarBtn.addEventListener('click', () => {
-      window.location.href = '/home.html';
-    });
+const email = [];
+
+window.addEventListener('DOMContentLoaded', async () => {
+
+  try{
+    const res = await fetch('http://localhost:3000/api/funcionarios/obterFuncionario', {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (!res.ok) {
+      const erro = await res.json();
+      console.error('Erro: ', erro);
+      alert(`Erro ao carregar funcionário: ${erro.message}`);
+      return;
+    }
+
+    const dados = await res.json();
+    const usuario = dados.funcionario;
+    email.push(usuario.email);
+    preencherPainel(usuario);
+    
+
+  } catch (error) {
+    console.error('Erro ao buscar dados do usuário:', error);
+    alert("Você precisa estar logado para acessar essa página!");
   }
-  
-  // Evento do botão de solicitar senha
+
+});
+
+function preencherPainel(usuario) {
+  document.getElementById('nome').textContent = usuario.nome;
+  document.getElementById('matricula').textContent = usuario.matricula;
+  document.getElementById('funcao').textContent = usuario.cargo;
+  document.getElementById('email').textContent = usuario.email;
+  document.getElementById('senha').textContent = "********";
+}
+
+// Evento para voltar à home
+const voltarBtn = document.getElementById('voltar-home');
+if (voltarBtn) {
+  voltarBtn.addEventListener('click', () => {
+    window.location.href = '/home.html';
+  });
+}
+
+// Evento do botão de solicitar senha
 const botaoSolicitarSenha = document.querySelector('button.btn-outline-secondary');
 const mensagemEmail = document.getElementById('mensagem-email');
 
 botaoSolicitarSenha.addEventListener('click', () => {
   if (mensagemEmail) {
-    mensagemEmail.textContent = `Um e-mail de redefinição foi enviado para ${usuarioLogado.email}`;
+    mensagemEmail.textContent = `Um e-mail de redefinição foi enviado para ${email[0]}`;
     mensagemEmail.style.display = 'block';
   }
 }); 

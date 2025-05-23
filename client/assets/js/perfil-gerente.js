@@ -82,7 +82,6 @@ async function buscarFuncionarios() {
     });
 
     const funcionarios = await res.json();
-    console.log(funcionarios);
 
     usuarios = funcionarios.map(funcionario => ({
       _id: funcionario._id,
@@ -93,8 +92,6 @@ async function buscarFuncionarios() {
       senha: funcionario.senha
     }));
 
-    console.log("pós map");
-    console.log(usuarios);
     renderizarListaUsuarios();
 
   }
@@ -165,7 +162,7 @@ async function carregarPerfilGerente() {
     if (!res.ok) {
       const erro = await res.json();
       console.error('Erro: ', erro);
-      alert(`Erro ao carregar funcionario: `, erro.message);
+      alert(`Erro ao carregar funcionario: ${erro.message}`);
       return
     }
     

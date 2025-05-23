@@ -12,7 +12,6 @@ async function carregarProdutos() {
     try{
         const res = await fetch('http://localhost:3000/api/produtos/listarProdutos')
         const dados = await res.json();
-        console.log(dados);
         produtos = dados.map( p => ({
             _id: p._id,
             nome: p.nome,
@@ -20,9 +19,6 @@ async function carregarProdutos() {
             estoque: p.estoque,
             categoria: p.categoria
         }));
-
-        console.log("pós map");
-        console.log(produtos);
 
         preencherCategorias();
         renderizarProdutos(produtos);

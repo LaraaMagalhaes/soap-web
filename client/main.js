@@ -26,9 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const data = await res.json();
-      console.log(data)
       localStorage.setItem("token", data.token)
-
       const tipoUsuario = data.funcionario.cargo?.toLowerCase();
       
 
