@@ -81,6 +81,11 @@ async function buscarFuncionarios() {
       credentials: 'include'
     });
 
+    if (!res.ok) {
+      const erro = await res.json();
+      console.error('Erro ao listar buscar tarefas: ', erro);
+    }
+
     const funcionarios = await res.json();
 
     usuarios = funcionarios.map(funcionario => ({
