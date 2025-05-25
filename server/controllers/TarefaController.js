@@ -1,6 +1,6 @@
 import Tarefa from "../models/Tarefa.js";
 
-export const listarTarefas = async (req, res) => { 
+export const listarTarefas = async (req, res) => {
     const tarefas = await Tarefa.find();
     try {
         res.status(200).json(tarefas);
@@ -11,14 +11,15 @@ export const listarTarefas = async (req, res) => {
 
 export const criarTarefa = async (req, res) => {
 
-    const { nome, descricao, dataCriacao, dataEntrega, status, matriculaFuncionario } = req.body;
+    const { nome, descricao, bloco, data, status, idFuncionario, nomeFuncionario } = req.body;
     const novaTarefa = new Tarefa({
         nome,
         descricao,
-        dataCriacao,
-        dataEntrega,
+        bloco,
+        data,
         status,
-        matriculaFuncionario
+        idFuncionario,
+        nomeFuncionario
     });
 
     console.log(req.body);

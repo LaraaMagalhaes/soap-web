@@ -1,7 +1,7 @@
 let usuarios = [];
 
 window.addEventListener('DOMContentLoaded', () => {
-  preencherPainel(usuarios[0]);
+  carregarPerfilGerente();
   renderizarListaUsuarios("");
 });
 
@@ -39,17 +39,18 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
     return;
   }
 
-  try{
+  try {
     const res = await fetch('http://localhost:3000/api/funcionarios/criarFuncionario', {
       method: 'POST',
-      headers: { 'Content-Type' : 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nome,
         cargo,
         matricula,
         email,
         senha
-      })
+      }),
+      credentials: 'include'
     });
 
     if (!res.ok) {
@@ -65,12 +66,6 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
     alert('Erro ao cadastrar funcionário. Tente novamente.');
   }
 
-  // let imagemURL = "../assets/images/noimage.png";
-  // if (fotoInput.files?.[0]) {
-  //   imagemURL = URL.createObjectURL(fotoInput.files[0]);
-  // }
-  // usuarios.push({ nome, cargo, email, matricula, senha, imagem: imagemURL });
-
   renderizarListaUsuarios();
   document.getElementById('modal-usuario').style.display = 'none';
   e.target.reset();
@@ -81,9 +76,17 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
 async function buscarFuncionarios() {
 
   try {
-    const res = await fetch('http://localhost:3000/api/funcionarios/listarFuncionarios');
+    const res = await fetch('http://localhost:3000/api/funcionarios/listarFuncionarios', {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (!res.ok) {
+      const erro = await res.json();
+      console.error('Erro ao listar buscar tarefas: ', erro);
+    }
+
     const funcionarios = await res.json();
-    console.log(funcionarios);
 
     usuarios = funcionarios.map(funcionario => ({
       _id: funcionario._id,
@@ -94,8 +97,6 @@ async function buscarFuncionarios() {
       senha: funcionario.senha
     }));
 
-    console.log("pós map");
-    console.log(usuarios);
     renderizarListaUsuarios();
 
   }
@@ -134,9 +135,9 @@ document.getElementById('busca-usuario').addEventListener("input", (e) => {
 function preencherPainel(usuario) {
   document.getElementById('nome').textContent = usuario.nome;
   document.getElementById('matricula').textContent = usuario.matricula;
-  document.getElementById('funcao').textContent = usuario.funcao;
+  document.getElementById('funcao').textContent = usuario.cargo;
   document.getElementById('email').textContent = usuario.email;
-  document.getElementById('senha').textContent = usuario.senha;
+  document.getElementById('senha').textContent = "*************";
 
   const btnSenha = document.getElementById('btn-solicitar-senha');
   if (usuario.cargo.toLowerCase() === 'gerente') {
@@ -153,3 +154,30 @@ document.getElementById('btn-solicitar-senha')?.addEventListener('click', () => 
   msg.textContent = `Um e-mail com sua senha foi enviado para ${email}`;
   msg.style.display = 'block';
 });
+
+async function carregarPerfilGerente() {
+
+  try {
+    const res = await fetch('http://localhost:3000/api/funcionarios/obterFuncionario', {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    
+    if (!res.ok) {
+      const erro = await res.json();
+      console.error('Erro: ', erro);
+      alert(`Erro ao carregar funcionario: ${erro.message}`);
+      return
+    }
+    
+    const dados = await res.json();
+    const usuario = dados.funcionario;
+    preencherPainel(usuario)
+
+  } catch (error) {
+    console.error('Erro ao carregar perfil do gerente: ', error);
+    alert("Você precisa estar logado para acessar essa página!")
+    window.location.href = 'index.html'
+  }
+}

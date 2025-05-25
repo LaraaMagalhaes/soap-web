@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database.js';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 
 // Importando as rotas
 import funcionarioRoute from './routes/FuncionarioRoute.js';
@@ -14,9 +15,17 @@ import productRoute from './routes/ProductRouter.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}))
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join('..assets/images/uploads')));
+app.use(cookieParser());
+
+
 
 
 // Rota raiz
@@ -45,7 +54,7 @@ app.use((req, res) => {
     caminho: req.originalUrl
   });
 });
-  
+
 connectDB();
 
 app.listen(process.env.PORT, () => {
