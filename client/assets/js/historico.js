@@ -56,7 +56,16 @@ async function buscarRegistros() {
       acc[r.data].push(r);
       return acc;
     }, {});
-
+    // Garante os últimos 7 dias (mesmo que vazios)
+    const hoje = new Date();
+    for (let i = 0; i < 7; i++) {
+      const dia = new Date(hoje);
+      dia.setDate(hoje.getDate() - i);
+      const dataFormatada = dia.toLocaleDateString('pt-BR');
+    if (!registrosPorData[dataFormatada]) {
+      registrosPorData[dataFormatada] = [];
+    }
+  }
   } catch (error) {
     console.error('Erro ao buscar tarefas:', error);
   }
@@ -144,21 +153,6 @@ function renderHistorico() {
 
     sec.appendChild(lista);
 
-    const divBtn = document.createElement("div");
-    divBtn.className = "text-center p-2";
-    const btnAdd = document.createElement("button");
-    btnAdd.className = "btn btn-outline-primary";
-    btnAdd.textContent = "Adicionar";
-    btnAdd.dataset.data = data;
-    btnAdd.addEventListener("click", () => {
-      dataAtual = data;
-      painelVisualizacao.classList.add("d-none");
-      painelAdicionar.classList.remove("d-none");
-      document.getElementById("titulo-servico-adicionar").textContent = "Serviço";
-    });
-    divBtn.appendChild(btnAdd);
-    sec.appendChild(divBtn);
-
     colunaHistorico.appendChild(sec);
   });
 }
@@ -173,32 +167,6 @@ function preencherFormulario(data, index) {
   textareaDescricao.value = p.descricao;
   tituloTarefa.textContent = p.nome;
 }
-
-// ========================= BOTÃO REMOVER ==============================
-btnRemover.onclick = () => confirmacaoRemocao.classList.remove("d-none");
-btnConfirmarNao.onclick = () => confirmacaoRemocao.classList.add("d-none");
-
-btnConfirmarSim.addEventListener("click", async () => {
-  const id = registrosPorData[dataAtual][indiceAtual].id;
-  try {
-    const res = await fetch(`http://localhost:3000/api/tarefas/deletarTarefa/${id}`, {
-      method: "DELETE",
-      credentials: "include"
-    });
-
-    if (!res.ok) {
-      console.error("Erro ao remover tarefa: ", await res.json());
-    } else {
-      registrosPorData[dataAtual].splice(indiceAtual, 1);
-      if (registrosPorData[dataAtual].length === 0) delete registrosPorData[dataAtual];
-      renderHistorico();
-      confirmacaoRemocao.classList.add("d-none");
-      painelVisualizacao.classList.add("d-none");
-    }
-  } catch (error) {
-    console.error("Erro ao remover tarefa:", error);
-  }
-});
 
 // ============================ FORMULÁRIO ==============================
 function popularSelects() {

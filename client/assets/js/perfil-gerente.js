@@ -1,5 +1,7 @@
 let usuarios = [];
 
+const token = localStorage.getItem('token');
+
 window.addEventListener('DOMContentLoaded', () => {
   carregarPerfilGerente();
   renderizarListaUsuarios("");
@@ -27,7 +29,6 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
   const email = document.getElementById('email-usuario').value.trim();
   const matricula = document.getElementById('matricula-usuario').value.trim();
   const senha = document.getElementById('senha-usuario').value;
-  const fotoInput = document.getElementById('foto-usuario');
 
   if (!nome || !cargo || !email || !matricula || !senha) {
     alert("Preencha todos os campos obrigatórios.");
@@ -40,18 +41,21 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
   }
 
   try {
-    const res = await fetch('http://localhost:3000/api/funcionarios/criarFuncionario', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nome,
-        cargo,
-        matricula,
-        email,
-        senha
-      }),
-      credentials: 'include'
-    });
+const res = await fetch('http://localhost:3000/api/funcionarios/criarFuncionario', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+  body: JSON.stringify({
+    nome,
+    cargo,
+    matricula,
+    email,
+    senha
+  })
+});
+
 
     if (!res.ok) {
       const erro = await res.json();
@@ -66,7 +70,7 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
     alert('Erro ao cadastrar funcionário. Tente novamente.');
   }
 
-  renderizarListaUsuarios();
+  await buscarFuncionarios();
   document.getElementById('modal-usuario').style.display = 'none';
   e.target.reset();
 });
@@ -77,9 +81,12 @@ async function buscarFuncionarios() {
 
   try {
     const res = await fetch('http://localhost:3000/api/funcionarios/listarFuncionarios', {
-      method: 'GET',
-      credentials: 'include'
-    });
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
 
     if (!res.ok) {
       const erro = await res.json();
@@ -133,6 +140,8 @@ document.getElementById('busca-usuario').addEventListener("input", (e) => {
 
 // Preenche o painel esquerdo e ajusta botões
 function preencherPainel(usuario) {
+  idUsuarioAtual = usuario._id;
+  
   document.getElementById('nome').textContent = usuario.nome;
   document.getElementById('matricula').textContent = usuario.matricula;
   document.getElementById('funcao').textContent = usuario.cargo;
@@ -140,11 +149,8 @@ function preencherPainel(usuario) {
   document.getElementById('senha').textContent = "*************";
 
   const btnSenha = document.getElementById('btn-solicitar-senha');
-  if (usuario.cargo.toLowerCase() === 'gerente') {
-    btnSenha.style.display = 'block';
-  } else {
-    btnSenha.style.display = 'none';
-  }
+  btnSenha.style.display = 'block';
+
 }
 
 // Botão solicitar senha
@@ -159,9 +165,12 @@ async function carregarPerfilGerente() {
 
   try {
     const res = await fetch('http://localhost:3000/api/funcionarios/obterFuncionario', {
-      method: 'GET',
-      credentials: 'include'
-    });
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
 
     
     if (!res.ok) {
@@ -181,3 +190,74 @@ async function carregarPerfilGerente() {
     window.location.href = 'index.html'
   }
 }
+
+
+
+let editando = false;
+let idUsuarioAtual = null; // Será definido em preencherPainel()
+
+document.getElementById('btn-editar').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-editar');
+  const nomeEl = document.getElementById('nome');
+  const funcaoEl = document.getElementById('funcao');
+  const emailEl = document.getElementById('email');
+
+  if (!editando) {
+    // Ativa edição
+    nomeEl.contentEditable = true;
+    funcaoEl.contentEditable = true;
+    emailEl.contentEditable = true;
+
+    nomeEl.classList.add('border', 'rounded', 'p-1');
+    funcaoEl.classList.add('border', 'rounded', 'p-1');
+    emailEl.classList.add('border', 'rounded', 'p-1');
+
+    btn.textContent = 'Salvar';
+    editando = true;
+  } else {
+    // Coleta novos valores
+    const nome = nomeEl.textContent.trim();
+    const cargo = funcaoEl.textContent.trim();
+    const email = emailEl.textContent.trim();
+
+    if (!nome || !cargo || !email) {
+      alert('Preencha todos os campos.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/funcionarios/atualizarFuncionario/${idUsuarioAtual}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ nome, cargo, email })
+      });
+
+      if (!res.ok) {
+        const erro = await res.json();
+        alert(`Erro ao atualizar: ${erro.message}`);
+        return;
+      }
+
+      alert('Dados atualizados com sucesso!');
+      await buscarFuncionarios();
+
+      nomeEl.contentEditable = false;
+      funcaoEl.contentEditable = false;
+      emailEl.contentEditable = false;
+
+      nomeEl.classList.remove('border', 'rounded', 'p-1');
+      funcaoEl.classList.remove('border', 'rounded', 'p-1');
+      emailEl.classList.remove('border', 'rounded', 'p-1');
+
+      btn.textContent = 'Editar';
+      editando = false;
+
+    } catch (error) {
+      console.error('Erro ao atualizar funcionário:', error);
+      alert('Erro ao atualizar funcionário.');
+    }
+  }
+});

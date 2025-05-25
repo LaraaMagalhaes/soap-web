@@ -11,6 +11,11 @@ import funcionarioRoute from './routes/FuncionarioRoute.js';
 import tarefaRoute from './routes/TarefaRoute.js';
 import adminRoute from './routes/AdminRoute.js';
 import productRoute from './routes/ProductRouter.js';
+import servicoRoutes from './routes/ServicoRoute.js';
+import blocoRoutes from './routes/BlocoRoute.js';
+
+
+
 
 dotenv.config();
 
@@ -46,6 +51,9 @@ app.use('/api/admin', adminRoute);
 // Rota para listar produtos
 app.use('/api/produtos', productRoute);
 
+app.use('/api/servicos', servicoRoutes);
+
+app.use('/api/blocos', blocoRoutes);
 
 // Rota coringa: deve ser a **última**
 app.use((req, res) => {

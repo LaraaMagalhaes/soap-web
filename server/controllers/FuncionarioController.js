@@ -6,12 +6,24 @@ import { gerarToken } from '../utils/jwt.js';
 export const login = async (req, res) => {
     const { matricula, senha } = req.body;
 
+    console.log('[LOGIN] Requisição recebida com os dados:', { matricula, senha });
+
     try {
         const funcionario = await Funcionario.findOne({ matricula });
-        if (!funcionario) return res.status(404).json({ message: 'Funcionário não encontrado' });
+
+        if (!funcionario) {
+            console.log('[LOGIN] Matrícula não encontrada');
+            return res.status(404).json({ message: 'Funcionário não encontrado' });
+        }
 
         const senhaValida = await verificarSenha(senha, funcionario.senha);
-        if (!senhaValida) return res.status(401).json({ message: 'Senha inválida' });
+
+        if (!senhaValida) {
+            console.log('[LOGIN] Senha inválida');
+            return res.status(401).json({ message: 'Senha inválida' });
+        }
+
+        console.log('[LOGIN] Login bem-sucedido');
 
         const token = gerarToken(funcionario);
 
@@ -20,10 +32,11 @@ export const login = async (req, res) => {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'Strict',
             maxAge: 60 * 60 * 1000
-        })
+        });
 
         res.json({
-            token, funcionario: {
+            token,
+            funcionario: {
                 id: funcionario._id,
                 nome: funcionario.nome,
                 cargo: funcionario.cargo,
@@ -31,9 +44,11 @@ export const login = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ erro: 'Erro no login', err: error.message });
+        console.error('[LOGIN] ERRO INTERNO:', error);
+        res.status(500).json({ erro: 'Erro no login', detalhe: error.message });
     }
-}
+};
+
 
 export const logout = (req, res) => {
     res.clearCookie('token', {
@@ -98,24 +113,31 @@ export const obterFuncionario = async (req, res) => {
 }
 
 export const atualizarFuncionario = async (req, res) => {
-    const { nome, cargo, matricula, email, senha } = req.body;
-    const senhaHash = await hashSenha(senha);
+  const { nome, cargo, matricula, email, senha } = req.body;
 
-    try {
-        const funcionario = await Funcionario.findByIdAndUpdate(
-            req.params._id,
-            { nome, cargo, matricula, email, senha: senhaHash },
-            { new: true }
-        );
+  const camposAtualizados = { nome, cargo, matricula, email };
 
-        if (!funcionario) {
-            return res.status(404).json({ message: 'Funcionário não encontrado' });
-        }
-        res.status(200).json(funcionario);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+  if (senha && senha.trim() !== "") {
+    camposAtualizados.senha = await hashSenha(senha);
+  }
+
+  try {
+    const funcionario = await Funcionario.findByIdAndUpdate(
+      req.params._id,
+      camposAtualizados,
+      { new: true }
+    );
+
+    if (!funcionario) {
+      return res.status(404).json({ message: 'Funcionário não encontrado' });
     }
-}
+
+    res.status(200).json(funcionario);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 export const atualizarSenha = async (req, res) => {
     const { senha } = req.body;

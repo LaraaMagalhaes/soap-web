@@ -100,13 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     mensagemStatus.textContent = ''; // limpa a mensagem ao trocar de pessoa
   }
 
-  //redirecionamento para escolha.html ao clicar no botão de reposição
-  const botaoReposicao = document.getElementById('botao-reposicao');
-
-  botaoReposicao.addEventListener('click', () => {
-    window.location.href = 'escolha-gerente.html';
-  });
-
   const botaoPerfil = document.getElementById('botao-perfil');
 
   botaoPerfil.addEventListener('click', () => {

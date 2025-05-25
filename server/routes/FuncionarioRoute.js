@@ -23,7 +23,7 @@ router.post('/logout', logout)
 router.get('/listarFuncionarios', autenticarToken, listarFuncionarios);
 router.post('/criarFuncionario', autenticarToken, criarFuncionario);
 router.get('/obterFuncionario', autenticarToken, obterFuncionario);
-router.put('/atualizarFuncionario/:_id', atualizarFuncionario);
+router.put('/atualizarFuncionario/:_id', autenticarToken, atualizarFuncionario);
 router.delete('/deletarFuncionario/:_id', deletarFuncionario);
 
 router.put('/atualizarSenha/:_id', atualizarSenha);
