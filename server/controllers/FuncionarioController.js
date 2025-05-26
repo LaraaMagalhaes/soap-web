@@ -6,24 +6,18 @@ import { gerarToken } from '../utils/jwt.js';
 export const login = async (req, res) => {
     const { matricula, senha } = req.body;
 
-    console.log('[LOGIN] Requisição recebida com os dados:', { matricula, senha });
-
     try {
         const funcionario = await Funcionario.findOne({ matricula });
 
         if (!funcionario) {
-            console.log('[LOGIN] Matrícula não encontrada');
             return res.status(404).json({ message: 'Funcionário não encontrado' });
         }
 
         const senhaValida = await verificarSenha(senha, funcionario.senha);
 
         if (!senhaValida) {
-            console.log('[LOGIN] Senha inválida');
             return res.status(401).json({ message: 'Senha inválida' });
         }
-
-        console.log('[LOGIN] Login bem-sucedido');
 
         const token = gerarToken(funcionario);
 
@@ -44,7 +38,6 @@ export const login = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('[LOGIN] ERRO INTERNO:', error);
         res.status(500).json({ erro: 'Erro no login', detalhe: error.message });
     }
 };
@@ -61,8 +54,8 @@ export const logout = (req, res) => {
 }
 
 export const listarFuncionarios = async (req, res) => {
-    const funcionarios = await Funcionario.find();
     try {
+        const funcionarios = await Funcionario.find();
         res.status(200).json(funcionarios);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -87,7 +80,6 @@ export const criarFuncionario = async (req, res) => {
         return res.status(400).json({ message: "Matrícula já cadastrada." });
     }
 
-    console.log(req.body);
     try {
         await novoFuncionario.save();
         res.status(201).json(novoFuncionario);
@@ -142,8 +134,6 @@ export const atualizarFuncionario = async (req, res) => {
 export const atualizarSenha = async (req, res) => {
     const { senha } = req.body;
     const senhaHash = await hashSenha(senha);
-
-    console.log(req.params)
 
     try {
         const funcionario = await Funcionario.findByIdAndUpdate(

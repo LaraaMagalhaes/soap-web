@@ -1,7 +1,5 @@
 let usuarios = [];
 
-const token = localStorage.getItem('token');
-
 window.addEventListener('DOMContentLoaded', () => {
   carregarPerfilGerente();
   renderizarListaUsuarios("");
@@ -41,20 +39,18 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
   }
 
   try {
-const res = await fetch('http://localhost:3000/api/funcionarios/criarFuncionario', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  },
-  body: JSON.stringify({
-    nome,
-    cargo,
-    matricula,
-    email,
-    senha
-  })
-});
+    const res = await fetch('http://localhost:3000/api/funcionarios/criarFuncionario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({
+        nome,
+        cargo,
+        matricula,
+        email,
+        senha
+      })
+    });
 
 
     if (!res.ok) {
@@ -75,17 +71,14 @@ const res = await fetch('http://localhost:3000/api/funcionarios/criarFuncionario
   e.target.reset();
 });
 
-
 // Atualiza a lista de usuários
 async function buscarFuncionarios() {
 
   try {
     const res = await fetch('http://localhost:3000/api/funcionarios/listarFuncionarios', {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
+      method: 'GET',
+      credentials: 'include'
+    });
 
 
     if (!res.ok) {
@@ -141,7 +134,7 @@ document.getElementById('busca-usuario').addEventListener("input", (e) => {
 // Preenche o painel esquerdo e ajusta botões
 function preencherPainel(usuario) {
   idUsuarioAtual = usuario._id;
-  
+
   document.getElementById('nome').textContent = usuario.nome;
   document.getElementById('matricula').textContent = usuario.matricula;
   document.getElementById('funcao').textContent = usuario.cargo;
@@ -165,21 +158,17 @@ async function carregarPerfilGerente() {
 
   try {
     const res = await fetch('http://localhost:3000/api/funcionarios/obterFuncionario', {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
+      method: 'GET',
+      credentials: 'include'
+    });
 
-
-    
     if (!res.ok) {
       const erro = await res.json();
       console.error('Erro: ', erro);
       alert(`Erro ao carregar funcionario: ${erro.message}`);
       return
     }
-    
+
     const dados = await res.json();
     const usuario = dados.funcionario;
     preencherPainel(usuario)
@@ -228,10 +217,8 @@ document.getElementById('btn-editar').addEventListener('click', async () => {
     try {
       const res = await fetch(`http://localhost:3000/api/funcionarios/atualizarFuncionario/${idUsuarioAtual}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ nome, cargo, email })
       });
 

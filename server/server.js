@@ -14,9 +14,6 @@ import productRoute from './routes/ProductRouter.js';
 import servicoRoutes from './routes/ServicoRoute.js';
 import blocoRoutes from './routes/BlocoRoute.js';
 
-
-
-
 dotenv.config();
 
 const app = express();
@@ -29,9 +26,6 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static(path.join('..assets/images/uploads')));
 app.use(cookieParser());
-
-
-
 
 // Rota raiz
 app.get('/', (req, res) => {

@@ -11,7 +11,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (!res.ok) {
       const erro = await res.json();
       console.error('Erro: ', erro);
-      alert(`Erro ao carregar funcionário: ${erro.message}`);
       return;
     }
 
