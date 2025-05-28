@@ -36,6 +36,7 @@ async function buscarRegistros() {
     }
     
     const dados = await res.json();
+
     registros = dados.map(tarefa => {
       const dataObj = new Date(tarefa.data);
       return {
@@ -43,8 +44,8 @@ async function buscarRegistros() {
         nome: tarefa.nome,
         descricao: tarefa.descricao,
         bloco: tarefa.bloco,
-        data: dataObj.toLocaleDateString('pt-BR'),
-        hora: String(dataObj.getHours()).padStart(2, '0') + ':' + String(dataObj.getMinutes()).padStart(2, '0'),
+        data: dataObj.toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
+        hora: tarefa.horario,
         status: tarefa.status,
         idFuncionario: tarefa.idFuncionario,
         nomeFuncionario: tarefa.nomeFuncionario
@@ -202,7 +203,6 @@ formAdicionar.addEventListener("submit", async (e) => {
     if (!res.ok) return alert(`Erro ao criar tarefa: ${(await res.json()).message}`);
 
     const dado = await res.json();
-    console.log(dado);
     const novasTarefas = (Array.isArray(dado) ? dado : [dado]).map(tarefa => {
       const dataObj = new Date(tarefa.data);
       return {

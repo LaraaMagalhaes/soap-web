@@ -15,7 +15,7 @@ import {
 
 const router = express.Router();
 
-// Rotas protegidas
+// Rotas protegidas, nao precisa proteger
 router.post('/login', login);
 router.post('/logout', logout)
 

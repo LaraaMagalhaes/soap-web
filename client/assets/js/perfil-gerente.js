@@ -34,6 +34,7 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
   }
 
   if (usuarios.some(u => u.matricula === matricula)) {
+    alert("Matricula já cadastrada!");
     exibirMensagem("Matrícula já cadastrada.", "erro");
     return;
   }
