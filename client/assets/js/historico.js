@@ -44,7 +44,7 @@ async function buscarRegistros() {
         descricao: tarefa.descricao,
         bloco: tarefa.bloco,
         data: dataObj.toLocaleDateString('pt-BR'),
-        hora: dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        hora: String(dataObj.getHours()).padStart(2, '0') + ':' + String(dataObj.getMinutes()).padStart(2, '0'),
         status: tarefa.status,
         idFuncionario: tarefa.idFuncionario,
         nomeFuncionario: tarefa.nomeFuncionario

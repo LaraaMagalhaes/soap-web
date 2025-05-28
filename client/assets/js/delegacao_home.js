@@ -1,67 +1,9 @@
-const registros = [
-  {
-    nome: "Maria Antônia de Freitas",
-    horario: "08:30",
-    bloco: "Bloco A",
-    tarefa: "Limpeza Banheiros",
-    descricao: "Descrição da Maria Antônia de Freitas"
-  },
-  {
-    nome: "José da Silva Sales",
-    horario: "08:30",
-    bloco: "Bloco B",
-    tarefa: "Reposição de Materiais",
-    descricao: "Descrição do José da Silva Sales."
-  },
-  {
-    nome: "Francisco de Assis Nunes",
-    horario: "08:30",
-    bloco: "Bloco C",
-    tarefa: "Limpeza de Janelas",
-    descricao: "Descrição de Francisco de Assis Nunes."
-  },
-  {
-    nome: "Julia Maria Torres",
-    horario: "08:30",
-    bloco: "Bloco D",
-    tarefa: "Verificação de Estoque",
-    descricao: "Descrição da Julia Maria Torres."
-  },
-  {
-    nome: "Adalberto Santos Magalhães",
-    horario: "15:30",
-    bloco: "Bloco A",
-    tarefa: "Limpeza Banheiros",
-    descricao: "Descrição do Adalberto Santos Magalhães."
-  },
-  {
-    nome: "José da Silva Sales",
-    horario: "15:30",
-    bloco: "Bloco B",
-    tarefa: "Limpeza Corredores",
-    descricao: "Descrição alternativa de José da Silva Sales."
-  }
-];
+let registros = [];
 
-const servicos = {
-  "Limpeza Banheiros": "Realizar limpeza completa dos banheiros.",
-  "Reposição de Materiais": "Verificar e repor materiais de limpeza.",
-  "Limpeza de Janelas": "Limpar todas as janelas do andar.",
-  "Verificação de Estoque": "Checar níveis de estoque e registrar necessidades.",
-  "Limpeza Corredores": "Varrição e lavagem de corredores."
-};
+let servicos = {};
+let responsaveis = [];
+let blocos = [];
 
-const responsaveis = [
-  "Maria Antônia de Freitas",
-  "José da Silva Sales",
-  "Francisco de Assis Nunes",
-  "Julia Maria Torres",
-  "Adalberto Santos Magalhães"
-];
-
-const blocos = ["Bloco A", "Bloco B", "Bloco C", "Bloco D", "Bloco E"];
-
-// DOM Elements
 const listaAgendamentos = document.getElementById("lista-agendamentos");
 const painelVisualizacao = document.getElementById("visualizacao-tarefa");
 const painelAdicionar = document.getElementById("formulario-adicionar");
@@ -80,7 +22,17 @@ const inputHorarioNovo = document.getElementById("input-horario");
 const textareaNovaDescricao = document.getElementById("textarea-descricao");
 const formAdicionar = document.getElementById("form-adicionar");
 
+const inputData = document.getElementById("input-data");
+
 let indiceAtual = 0;
+
+function atualizarDataCabecalho() {
+  const hoje = new Date();
+  const yyyy = hoje.getFullYear();
+  const mm = String(hoje.getMonth() + 1).padStart(2, "0");
+  const dd = String(hoje.getDate()).padStart(2, "0");
+  inputData.value = `${yyyy}-${mm}-${dd}`;
+}
 
 function renderizarLista() {
   listaAgendamentos.innerHTML = "";
@@ -111,43 +63,78 @@ function preencherFormulario(index) {
   textareaDescricao.value = pessoa.descricao;
   tituloTarefa.textContent = pessoa.tarefa;
 }
-const btnRemover = document.getElementById("botao-remover");
-const confirmacaoRemocao = document.getElementById("confirmacao-remocao");
-const btnConfirmarSim = document.getElementById("btn-confirmar-sim");
-const btnConfirmarNao = document.getElementById("btn-confirmar-nao");
 
-btnRemover.onclick = () => {
-confirmacaoRemocao.classList.remove("d-none");
+// Remoção
+document.getElementById("botao-remover").onclick = () => {
+  document.getElementById("confirmacao-remocao").classList.remove("d-none");
 };
 
-btnConfirmarNao.onclick = () => {
-confirmacaoRemocao.classList.add("d-none");
+document.getElementById("btn-confirmar-nao").onclick = () => {
+  document.getElementById("confirmacao-remocao").classList.add("d-none");
 };
 
-btnConfirmarSim.onclick = () => {
-registros.splice(indiceAtual, 1); // remove do array
-renderizarLista();
-preencherFormulario(0);
-confirmacaoRemocao.classList.add("d-none");
+document.getElementById("btn-confirmar-sim").onclick = async () => {
+  const idParaExcluir = registros[indiceAtual]?._id;
+
+  if (!idParaExcluir) {
+    alert("ID da tarefa não encontrado.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/tarefas/deletarTarefa/${idParaExcluir}`, {
+      method: "DELETE",
+      credentials: "include"
+    });
+
+    if (!res.ok) throw new Error("Erro ao deletar tarefa");
+
+    registros.splice(indiceAtual, 1);
+    renderizarLista();
+    preencherFormulario(0);
+    document.getElementById("confirmacao-remocao").classList.add("d-none");
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao remover atribuição do banco.");
+  }
 };
 
-
-function popularSelects() {
-  Object.keys(servicos).forEach(servico => {
-    selectServico.innerHTML += `<option value="${servico}">${servico}</option>`;
+async function carregarServicos() {
+  const res = await fetch("http://localhost:3000/api/servicos/listarServicos");
+  const dados = await res.json();
+  servicos = {};
+  selectServico.innerHTML = '<option disabled selected>Selecione um serviço</option>';
+  dados.forEach(s => {
+    servicos[s.nome] = s.descricao;
+    selectServico.innerHTML += `<option value="${s.nome}">${s.nome}</option>`;
   });
-  responsaveis.forEach(nome => {
-    selectResponsavel.innerHTML += `<option value="${nome}">${nome}</option>`;
+}
+
+async function carregarFuncionarios() {
+  const res = await fetch("http://localhost:3000/api/funcionarios/listarFuncionarios", {
+    credentials: "include"
   });
-  blocos.forEach(bloco => {
-    selectBloco.innerHTML += `<option value="${bloco}">${bloco}</option>`;
+  const dados = await res.json();
+  responsaveis = dados;
+  selectResponsavel.innerHTML = '<option disabled selected>Selecione um responsável</option>';
+  dados.forEach(f => {
+    selectResponsavel.innerHTML += `<option value="${f.nome}">${f.nome}</option>`;
+  });
+}
+
+async function carregarBlocos() {
+  const res = await fetch("http://localhost:3000/api/blocos/listarBlocos");
+  const dados = await res.json();
+  blocos = dados;
+  selectBloco.innerHTML = '<option disabled selected>Selecione um bloco</option>';
+  dados.forEach(b => {
+    selectBloco.innerHTML += `<option value="${b.nome}">${b.nome}</option>`;
   });
 }
 
 selectServico.addEventListener("change", () => {
   textareaNovaDescricao.value = servicos[selectServico.value] || "";
   document.getElementById("titulo-servico-adicionar").textContent = selectServico.value;
-
 });
 
 btnAdicionar.addEventListener("click", () => {
@@ -155,25 +142,82 @@ btnAdicionar.addEventListener("click", () => {
   painelAdicionar.classList.remove("d-none");
 });
 
-formAdicionar.addEventListener("submit", (e) => {
+formAdicionar.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const novo = {
-    nome: selectResponsavel.value,
-    horario: inputHorarioNovo.value,
+    nome: selectServico.value,
+    descricao: textareaNovaDescricao.value,
     bloco: selectBloco.value,
-    tarefa: selectServico.value,
-    descricao: textareaNovaDescricao.value
+    horario: inputHorarioNovo.value,
+    data: inputData.value,
+    nomeFuncionario: selectResponsavel.value,
+    idFuncionario: responsaveis.find(f => f.nome === selectResponsavel.value)?._id
   };
 
-  registros.push(novo);
+  const res = await fetch("http://localhost:3000/api/tarefas/criarTarefa", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(novo)
+  });
+
+  const salva = await res.json();
+  registros.push({
+    _id: salva._id,
+    nome: salva.nomeFuncionario,
+    bloco: salva.bloco,
+    horario: salva.horario,
+    tarefa: salva.nome,
+    descricao: salva.descricao
+  });
+
   renderizarLista();
   preencherFormulario(registros.length - 1);
-
   painelAdicionar.classList.add("d-none");
   painelVisualizacao.classList.remove("d-none");
 });
 
-popularSelects();
-renderizarLista();
-preencherFormulario(0);
+async function carregarTarefasDoDia() {
+  const dataSelecionada = inputData.value;
+
+  try {
+    const res = await fetch("http://localhost:3000/api/tarefas/listarTarefas", {
+      credentials: "include"
+    });
+
+    if (!res.ok) throw new Error("Erro ao carregar tarefas");
+
+    const tarefas = await res.json();
+
+    registros = tarefas.filter(t => {
+      const dataNormalizada = new Date(t.data).toISOString().split("T")[0];
+      return dataNormalizada === dataSelecionada;
+    }).map(t => ({
+      _id: t._id,
+      nome: t.nomeFuncionario,
+      bloco: t.bloco,
+      horario: t.horario,
+      tarefa: t.nome,
+      descricao: t.descricao
+    }));
+
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao buscar tarefas do dia");
+  }
+}
+
+inputData.addEventListener("change", async () => {
+  await carregarTarefasDoDia();
+  renderizarLista();
+});
+
+(async () => {
+  await carregarServicos();
+  await carregarFuncionarios();
+  await carregarBlocos();
+  atualizarDataCabecalho();
+  await carregarTarefasDoDia();
+  renderizarLista();
+})();

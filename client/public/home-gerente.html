@@ -11,10 +11,9 @@
 
 <!-- Top bar / Navbar -->
 <div class="nav-bar">
-  <!-- ✨ LINKS ADICIONADOS -->
-  <a href="#" class="nav-link" id="link-estoque">Controle de Estoque</a>
-  <a href="#" class="nav-link" id="link-historico">Histórico Semanal</a>
-  <a href="#" class="nav-link" id="link-tarefas">Delegação de Tarefas</a>
+  <a href="./controle-estoque.html" class="nav-link" id="link-estoque">Controle de Estoque</a>
+  <a href="./historico.html" class="nav-link" id="link-historico">Histórico Semanal</a>
+  <a href="./delegacao_home.html" class="nav-link" id="link-tarefas">Delegação de Tarefas</a>
 
   <!-- Ícone de usuário continua, mas com “ms-auto” para grudar na direita -->
   <div class="user-icon ms-auto" id="botao-perfil">
@@ -31,46 +30,7 @@
       <div class="w-100 w-md-50">
         <div class="card card-full-height">
           <div class="date-header">25/04/2025</div>
-          <div class="p-2 overflow-auto">
-
-            <!-- Cards com layout dividido -->
-            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="0">
-              <div class="fw-bold text-primary">08:30</div>
-              <div class="text-center flex-fill px-2">Maria Antônia de Freitas</div>
-              <div class="text-end text-muted">Bloco A</div>
-            </div>
-
-            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="1">
-              <div class="fw-bold text-primary">08:30</div>
-              <div class="text-center flex-fill px-2">José da Silva Sales</div>
-              <div class="text-end text-muted">Bloco B</div>
-            </div>
-
-            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="2">
-              <div class="fw-bold text-primary">08:30</div>
-              <div class="text-center flex-fill px-2">Francisco de Assis Nunes</div>
-              <div class="text-end text-muted">Bloco C</div>
-            </div>
-
-            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="3">
-              <div class="fw-bold text-primary">08:30</div>
-              <div class="text-center flex-fill px-2">Julia Maria Torres</div>
-              <div class="text-end text-muted">Bloco D</div>
-            </div>
-
-            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="4">
-              <div class="fw-bold text-primary">15:30</div>
-              <div class="text-center flex-fill px-2">Adalberto Santos Magalhães</div>
-              <div class="text-end text-muted">Bloco E</div>
-            </div>
-
-            <div class="schedule-card d-flex justify-content-between align-items-center" data-id="5">
-              <div class="fw-bold text-primary">15:30</div>
-              <div class="text-center flex-fill px-2">José da Silva Sales</div>
-              <div class="text-end text-muted">Bloco B</div>
-            </div>
-
-          </div>
+          <div class="p-2 overflow-auto" id="lista-agendamentos"></div>
         </div>
       </div>
 
@@ -88,15 +48,7 @@
                 <input type="text" class="form-control" value="Bloco A" readonly>
               </div>
               <label class="form-label">Descrição</label>
-              <textarea class="form-control mb-3" rows="5">
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium...
-              </textarea>
-
-              <div class="d-grid">
-                <button type="button" class="btn btn-primary">Enviar</button>
-              </div>
-              <!-- Adicione abaixo do botão "Enviar" -->
-              <div id="mensagem-status" class="mt-2 text-success"></div>
+              <textarea class="form-control mb-3" rows="5" disabled style="pointer-events: none;"></textarea>
 
             </form>
           </div>

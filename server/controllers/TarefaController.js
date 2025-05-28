@@ -11,12 +11,14 @@ export const listarTarefas = async (req, res) => {
 
 export const criarTarefa = async (req, res) => {
 
-    const { nome, descricao, bloco, data, status, idFuncionario, nomeFuncionario } = req.body;
+
+    const { nome, descricao, bloco, data, horario, status, idFuncionario, nomeFuncionario } = req.body;
     const novaTarefa = new Tarefa({
         nome,
         descricao,
         bloco,
         data,
+        horario,
         status,
         idFuncionario,
         nomeFuncionario

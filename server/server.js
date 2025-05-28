@@ -13,6 +13,7 @@ import adminRoute from './routes/AdminRoute.js';
 import productRoute from './routes/ProductRouter.js';
 import servicoRoutes from './routes/ServicoRoute.js';
 import blocoRoutes from './routes/BlocoRoute.js';
+import pedidosRoutes from './routes/pedidos.js';
 
 dotenv.config();
 
@@ -48,6 +49,8 @@ app.use('/api/produtos', productRoute);
 app.use('/api/servicos', servicoRoutes);
 
 app.use('/api/blocos', blocoRoutes);
+
+app.use('/api/pedidos', pedidosRoutes);
 
 // Rota coringa: deve ser a **última**
 app.use((req, res) => {

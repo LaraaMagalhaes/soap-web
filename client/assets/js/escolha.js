@@ -1,33 +1,65 @@
 const selecionados = new Set();
+let funcionarioLogado = null;
 
-// Produtos simulados vindos do "banco"
-const produtos = [
-  { nome: "Rodo", imagem: "../assets/images/rodo.jpg", unidades: 15 },
-  { nome: "Desinfetante", imagem: "../assets/images/desinfetante.png", unidades: 15 },
-  { nome: "Álcool", imagem: "../assets/images/alcool.png", unidades: 15 },
-  { nome: "Vassoura", imagem: "../assets/images/vassoura.png", unidades: 15 },
-  { nome: "Baldes", imagem: "../assets/images/balde.png", unidades: 10 },
-  { nome: "Panos", imagem: "../assets/images/pano.jpg", unidades: 20 },
-  { nome: "Limpa Vidros", imagem: "../assets/images/limpa-vidros.png", unidades: 5 },
-  { nome: "Sacos de Lixo", imagem: "../assets/images/saco-de-lixo.jpeg", unidades: 30 }
-];
+// ======================= BUSCA DO FUNCIONÁRIO LOGADO =======================
+async function buscarFuncionarioLogado() {
+  try {
+    const res = await fetch('http://localhost:3000/api/funcionarios/obterFuncionario', {
+      method: 'GET',
+      credentials: 'include'
+    });
 
-// Renderiza os produtos na tela
+    if (!res.ok) {
+      console.error('Erro ao obter funcionário logado');
+      exibirMensagem('Erro ao carregar funcionário logado.', 'danger');
+      return;
+    }
+
+    const dados = await res.json();
+    funcionarioLogado = dados.funcionario;
+  } catch (error) {
+    console.error('Erro ao buscar funcionário logado:', error);
+    exibirMensagem('Erro ao conectar com o servidor.', 'danger');
+  }
+}
+
+// ======================= BUSCA DO BANCO =======================
+async function buscarProdutos() {
+  try {
+    const res = await fetch('http://localhost:3000/api/produtos/listarProdutos', {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (!res.ok) {
+      const erro = await res.json();
+      console.error('Erro ao buscar produtos:', erro.message);
+      exibirMensagem('Erro ao carregar produtos.', 'danger');
+      return;
+    }
+
+    const dados = await res.json();
+    renderizarProdutos(dados);
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    exibirMensagem('Erro ao se conectar com o servidor.', 'danger');
+  }
+}
+
+// ======================= RENDERIZAÇÃO =======================
 function renderizarProdutos(lista) {
   const container = document.getElementById('produtos-container');
   container.innerHTML = '';
 
-  lista.forEach(produto => {
+  lista.forEach(prod => {
     const col = document.createElement('div');
     col.className = 'col-6 col-md-3';
 
     col.innerHTML = `
-      <div class="product-card" data-produto="${produto.nome}">
-        <img src="${produto.imagem}" class="product-img" alt="${produto.nome}">
-        <div class="d-flex justify-content-center align-items-center gap-2">
-          <div class="product-name m-0">${produto.nome}</div>
-          <div class="product-qty m-0">${produto.unidades}und</div>
-        </div>
+      <div class="product-card border p-3 rounded bg-light d-flex flex-column align-items-center" data-produto="${prod.nome}">
+        <div class="fw-bold text-center">${prod.nome}</div>
+        <div class="text-muted mt-1">${prod.estoque ?? 0} und</div>
+        ${prod.categoria ? `<div class="badge bg-secondary mt-2">${prod.categoria}</div>` : ''}
       </div>
     `;
 
@@ -37,7 +69,7 @@ function renderizarProdutos(lista) {
   ativarSelecao();
 }
 
-// Permite selecionar/deselecionar os produtos
+// ======================= SELEÇÃO =======================
 function ativarSelecao() {
   document.querySelectorAll('.product-card').forEach(card => {
     card.addEventListener('click', () => {
@@ -53,57 +85,76 @@ function ativarSelecao() {
   });
 }
 
-// Enviar produtos selecionados (modo simulado)
-function enviarProdutos() {
-  const mensagemEnvio = document.getElementById('mensagem-envio');
-  if (!mensagemEnvio) return;
-
-  if (selecionados.size === 0) {
-    mensagemEnvio.textContent = 'Nenhum produto selecionado.';
-    mensagemEnvio.className = 'text-center mt-3 fw-bold text-danger';
-    mensagemEnvio.style.display = 'block';
+// ======================= ENVIO =======================
+async function enviarProdutos() {
+  if (!funcionarioLogado) {
+    exibirMensagem('Funcionário não identificado.', 'danger');
     return;
   }
 
+  if (selecionados.size === 0) {
+    exibirMensagem('Nenhum produto selecionado.', 'danger');
+    return;
+  }
+
+  const produtosParaEnviar = Array.from(selecionados).map(nome => ({
+    nome,
+    quantidade: 1
+  }));
+
   const payload = {
-    usuario: 'usuario.exemplo', // futuro: substituir por dado do login
-    produtos: Array.from(selecionados)
+    solicitante: funcionarioLogado.nome,
+    produtos: produtosParaEnviar
   };
 
-  console.log("Simulando envio:", payload);
+  try {
+    const res = await fetch('http://localhost:3000/api/pedidos/criarPedido', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    });
 
-  // Simulação de sucesso
-  mensagemEnvio.textContent = 'Solicitação simulada com sucesso!';
-  mensagemEnvio.className = 'text-center mt-3 fw-bold text-success';
-  mensagemEnvio.style.display = 'block';
+    if (!res.ok) {
+      const erro = await res.json();
+      console.error('Erro ao enviar pedido:', erro.message);
+      exibirMensagem(`Erro: ${erro.message}`, 'danger');
+      return;
+    }
 
-  // ❗ Desmarca todos os produtos
-  document.querySelectorAll('.product-card.selected').forEach(card => {
-    card.classList.remove('selected');
-  });
+    exibirMensagem('✅ Pedido enviado com sucesso!', 'success');
 
-  // ❗ Limpa o conjunto
-  selecionados.clear();
+    document.querySelectorAll('.product-card.selected').forEach(card => {
+      card.classList.remove('selected');
+    });
+
+    selecionados.clear();
+
+  } catch (error) {
+    console.error('Erro de conexão:', error);
+    exibirMensagem('Erro de conexão ao enviar pedido.', 'danger');
+  }
 }
 
+// ======================= UTILIDADE: MENSAGEM =======================
+function exibirMensagem(texto, tipo = 'success') {
+  const msg = document.getElementById('mensagem-envio');
+  if (!msg) return;
 
-// Navega para a tela de perfil (futuro)
-function irPerfil() {
-  console.log('Indo para tela de perfil...');
+  msg.textContent = texto;
+  msg.className = `text-center mt-3 fw-bold text-${tipo}`;
+  msg.style.display = 'block';
+
+  setTimeout(() => {
+    msg.style.display = 'none';
+  }, 3000);
 }
 
-// Inicialização da página
-renderizarProdutos(produtos);
+// ======================= EVENTOS =======================
+document.getElementById('botao-enviar')?.addEventListener('click', enviarProdutos);
 
-// Eventos dos botões
-const botaoVoltar = document.getElementById('botao-voltar');
-if (botaoVoltar) {
-  botaoVoltar.addEventListener('click', () => {
-    window.location.href = '/home.html';
-  });
-}
-
-const botaoEnviar = document.getElementById('botao-enviar');
-if (botaoEnviar) {
-  botaoEnviar.addEventListener('click', enviarProdutos);
-}
+// ======================= INICIALIZAÇÃO =======================
+(async () => {
+  await buscarFuncionarioLogado();
+  await buscarProdutos();
+})();

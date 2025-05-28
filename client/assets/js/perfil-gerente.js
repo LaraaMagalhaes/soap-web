@@ -29,41 +29,35 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
   const senha = document.getElementById('senha-usuario').value;
 
   if (!nome || !cargo || !email || !matricula || !senha) {
-    alert("Preencha todos os campos obrigatórios.");
+    exibirMensagem("Preencha todos os campos obrigatórios.", "erro");
     return;
   }
 
   if (usuarios.some(u => u.matricula === matricula)) {
-    alert("Matrícula já cadastrada.");
+    exibirMensagem("Matrícula já cadastrada.", "erro");
     return;
   }
 
   try {
     const res = await fetch('http://localhost:3000/api/funcionarios/criarFuncionario', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({
-        nome,
-        cargo,
-        matricula,
-        email,
-        senha
-      })
+      body: JSON.stringify({ nome, cargo, matricula, email, senha })
     });
-
 
     if (!res.ok) {
       const erro = await res.json();
       console.error(erro);
-      alert(`Erro ao criar funcionario: ${erro.message}`);
+      exibirMensagem(`Erro ao criar funcionário: ${erro.message}`, "erro");
       return;
     }
-    alert('Funcionário cadastrado com sucesso!');
+
+    exibirMensagem("Funcionário cadastrado com sucesso!", "sucesso");
 
   } catch (error) {
     console.error('Erro ao cadastrar funcionário:', error);
-    alert('Erro ao cadastrar funcionário. Tente novamente.');
+    exibirMensagem("Erro ao cadastrar funcionário. Tente novamente.", "erro");
   }
 
   await buscarFuncionarios();
@@ -73,34 +67,30 @@ document.getElementById('form-usuario').addEventListener('submit', async (e) => 
 
 // Atualiza a lista de usuários
 async function buscarFuncionarios() {
-
   try {
     const res = await fetch('http://localhost:3000/api/funcionarios/listarFuncionarios', {
       method: 'GET',
       credentials: 'include'
     });
 
-
     if (!res.ok) {
       const erro = await res.json();
-      console.error('Erro ao listar buscar tarefas: ', erro);
+      console.error('Erro ao buscar funcionários: ', erro);
     }
 
     const funcionarios = await res.json();
 
-    usuarios = funcionarios.map(funcionario => ({
-      _id: funcionario._id,
-      nome: funcionario.nome,
-      matricula: funcionario.matricula,
-      cargo: funcionario.cargo,
-      email: funcionario.email,
-      senha: funcionario.senha
+    usuarios = funcionarios.map(f => ({
+      _id: f._id,
+      nome: f.nome,
+      matricula: f.matricula,
+      cargo: f.cargo,
+      email: f.email,
+      senha: f.senha
     }));
 
     renderizarListaUsuarios();
-
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Erro ao buscar funcionários:', error);
   }
 }
@@ -131,31 +121,34 @@ document.getElementById('busca-usuario').addEventListener("input", (e) => {
   renderizarListaUsuarios(e.target.value);
 });
 
-// Preenche o painel esquerdo e ajusta botões
+// Preenche o painel esquerdo
 function preencherPainel(usuario) {
   idUsuarioAtual = usuario._id;
-
   document.getElementById('nome').textContent = usuario.nome;
   document.getElementById('matricula').textContent = usuario.matricula;
   document.getElementById('funcao').textContent = usuario.cargo;
   document.getElementById('email').textContent = usuario.email;
   document.getElementById('senha').textContent = "*************";
 
-  const btnSenha = document.getElementById('btn-solicitar-senha');
-  btnSenha.style.display = 'block';
-
+  document.getElementById('btn-solicitar-senha').style.display = 'block';
 }
 
-// Botão solicitar senha
+// Solicitar senha
 document.getElementById('btn-solicitar-senha')?.addEventListener('click', () => {
   const email = document.getElementById('email').textContent;
   const msg = document.getElementById('mensagem-email');
   msg.textContent = `Um e-mail com sua senha foi enviado para ${email}`;
   msg.style.display = 'block';
+
+  // Oculta após 4 segundos
+  setTimeout(() => {
+    msg.style.display = 'none';
+  }, 3000);
 });
 
-async function carregarPerfilGerente() {
 
+// Carrega o perfil do gerente
+async function carregarPerfilGerente() {
   try {
     const res = await fetch('http://localhost:3000/api/funcionarios/obterFuncionario', {
       method: 'GET',
@@ -165,25 +158,24 @@ async function carregarPerfilGerente() {
     if (!res.ok) {
       const erro = await res.json();
       console.error('Erro: ', erro);
-      alert(`Erro ao carregar funcionario: ${erro.message}`);
-      return
+      exibirMensagem(`Erro ao carregar funcionário: ${erro.message}`, "erro");
+      return;
     }
 
     const dados = await res.json();
     const usuario = dados.funcionario;
-    preencherPainel(usuario)
-
+    preencherPainel(usuario);
   } catch (error) {
     console.error('Erro ao carregar perfil do gerente: ', error);
-    alert("Você precisa estar logado para acessar essa página!")
-    window.location.href = 'index.html'
+    exibirMensagem("Você precisa estar logado para acessar essa página!", "erro");
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 3000);
   }
 }
 
-
-
 let editando = false;
-let idUsuarioAtual = null; // Será definido em preencherPainel()
+let idUsuarioAtual = null;
 
 document.getElementById('btn-editar').addEventListener('click', async () => {
   const btn = document.getElementById('btn-editar');
@@ -192,7 +184,6 @@ document.getElementById('btn-editar').addEventListener('click', async () => {
   const emailEl = document.getElementById('email');
 
   if (!editando) {
-    // Ativa edição
     nomeEl.contentEditable = true;
     funcaoEl.contentEditable = true;
     emailEl.contentEditable = true;
@@ -204,13 +195,12 @@ document.getElementById('btn-editar').addEventListener('click', async () => {
     btn.textContent = 'Salvar';
     editando = true;
   } else {
-    // Coleta novos valores
     const nome = nomeEl.textContent.trim();
     const cargo = funcaoEl.textContent.trim();
     const email = emailEl.textContent.trim();
 
     if (!nome || !cargo || !email) {
-      alert('Preencha todos os campos.');
+      exibirMensagem("Preencha todos os campos.", "erro");
       return;
     }
 
@@ -224,11 +214,11 @@ document.getElementById('btn-editar').addEventListener('click', async () => {
 
       if (!res.ok) {
         const erro = await res.json();
-        alert(`Erro ao atualizar: ${erro.message}`);
+        exibirMensagem(`Erro ao atualizar: ${erro.message}`, "erro");
         return;
       }
 
-      alert('Dados atualizados com sucesso!');
+      exibirMensagem("Dados atualizados com sucesso!", "sucesso");
       await buscarFuncionarios();
 
       nomeEl.contentEditable = false;
@@ -244,7 +234,21 @@ document.getElementById('btn-editar').addEventListener('click', async () => {
 
     } catch (error) {
       console.error('Erro ao atualizar funcionário:', error);
-      alert('Erro ao atualizar funcionário.');
+      exibirMensagem("Erro ao atualizar funcionário.", "erro");
     }
   }
 });
+
+// Função para mostrar mensagem na tela
+function exibirMensagem(texto, tipo = "sucesso") {
+  const el = document.getElementById("mensagem-feedback");
+  if (!el) return;
+
+  el.textContent = texto;
+  el.className = `mensagem-feedback ${tipo}`;
+  el.style.display = "block";
+
+  setTimeout(() => {
+    el.style.display = "none";
+  }, 4000);
+}
