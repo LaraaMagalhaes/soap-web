@@ -24,7 +24,6 @@ export const criarTarefa = async (req, res) => {
         nomeFuncionario
     });
 
-    console.log(req.body);
     try {
         await novaTarefa.save();
         res.status(201).json(novaTarefa);

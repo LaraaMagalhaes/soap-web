@@ -1,5 +1,6 @@
 # Ignorar o .env do back-end
 server/.env
 
-node_modules
+server/node_modules
+client/node_modules
 

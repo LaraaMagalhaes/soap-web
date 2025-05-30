@@ -57,16 +57,16 @@ async function buscarRegistros() {
       acc[r.data].push(r);
       return acc;
     }, {});
-    // Garante os últimos 7 dias (mesmo que vazios)
-    const hoje = new Date();
-    for (let i = 0; i < 7; i++) {
-      const dia = new Date(hoje);
-      dia.setDate(hoje.getDate() - i);
-      const dataFormatada = dia.toLocaleDateString('pt-BR');
-    if (!registrosPorData[dataFormatada]) {
-      registrosPorData[dataFormatada] = [];
-    }
-  }
+    
+    // Mantém apenas os últimos 7 dias, mesmo que não haja registros e que haja registros futuros
+    const diasValidos = obterUltimosSeteDias();
+    const registrosFiltrados = {};
+    diasValidos.forEach(data => {
+      registrosFiltrados[data] = registrosPorData[data] || [];
+    });
+    
+    registrosPorData = registrosFiltrados;
+    
   } catch (error) {
     console.error('Erro ao buscar tarefas:', error);
   }
@@ -167,6 +167,19 @@ function preencherFormulario(data, index) {
   inputBloco.value = p.bloco;
   textareaDescricao.value = p.descricao;
   tituloTarefa.textContent = p.nome;
+}
+
+// ============================ OBTER ÚLTIMOS 7 DIAS ============================
+
+function obterUltimosSeteDias(){
+  const dias = [];
+  const hoje = new Date();
+  for (let i = 0; i < 7; i++) {
+    const dia = new Date(hoje);
+    dia.setDate(hoje.getDate() - i);
+    dias.push(dia.toLocaleDateString('pt-BR'));
+  }
+  return dias;
 }
 
 // ============================ FORMULÁRIO ==============================

@@ -34,7 +34,7 @@ async function carregarProdutos() {
     renderizarProdutos(produtos);
     ativarEdicaoQuantidade();
   } catch (error) {
-    console.log('Erro ao carregar produtos: ', error);
+    console.error('Erro ao carregar produtos: ', error);
   }
 }
 
