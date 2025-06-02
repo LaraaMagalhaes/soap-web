@@ -78,6 +78,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('botao-perfil').addEventListener('click', () => {
     window.location.href = 'perfil-gerente.html';
   });
+document.getElementById('menu-toggle-btn').addEventListener('click', () => {
+  document.getElementById('nav-links').classList.toggle('active');
+});
+
 
   await carregarTarefasDoDia();
   if (registros.length > 0) {
