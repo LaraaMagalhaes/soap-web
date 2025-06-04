@@ -134,21 +134,20 @@ function preencherPainel(usuario) {
   document.getElementById('btn-solicitar-senha').style.display = 'block';
 }
 
-// Solicitar senha
+
 document.getElementById('btn-solicitar-senha')?.addEventListener('click', () => {
   const email = document.getElementById('email').textContent;
   const msg = document.getElementById('mensagem-email');
   msg.textContent = `Um e-mail com sua senha foi enviado para ${email}`;
   msg.style.display = 'block';
 
-  // Oculta após 4 segundos
   setTimeout(() => {
     msg.style.display = 'none';
   }, 3000);
 });
 
 
-// Carrega o perfil do gerente
+
 async function carregarPerfilGerente() {
   try {
     const res = await fetch('http://localhost:3000/api/funcionarios/obterFuncionario', {

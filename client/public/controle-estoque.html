@@ -17,7 +17,6 @@
 </div>
 
   <div class="main-wrapper container mt-4">
-    <!-- Botão de registro -->
     <button class="btn btn-outline-primary w-100 mb-3" id="btn-registro-produto">
       ➕ Registre novos produtos
     </button>
@@ -29,14 +28,11 @@
       </select>
     </div>
 
-    <!-- 📦 Lista de produtos -->
     <div id="produtos-container" class="row g-3"></div>
 
-    <!-- Mensagem opcional -->
     <div id="mensagem-status" class="mt-3 fw-bold text-center"></div>
   </div>
 
-  <!-- Modal sobreposto -->
   <div id="modal-produto" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white d-flex align-items-center justify-content-between p-2">
@@ -45,7 +41,6 @@
       </div>
       <div class="modal-body p-3">
         <form id="form-produto">
-          <!-- Removido input-imagem -->
           <input type="text" class="form-control mb-2" placeholder="Nome do Produto" id="input-nome" required>
           <select class="form-select mb-2" id="input-categoria" required>
             <option value="">Selecione uma categoria</option>

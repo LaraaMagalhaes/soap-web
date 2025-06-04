@@ -115,12 +115,19 @@ async function carregarFuncionarios() {
     credentials: "include"
   });
   const dados = await res.json();
-  responsaveis = dados;
+
+  const operacionais = dados.filter(f => {
+    const cargo = f.cargo?.toLowerCase();
+    return cargo !== 'gerente' && cargo !== 'supervisor';
+  });
+
+  responsaveis = operacionais;
   selectResponsavel.innerHTML = '<option disabled selected>Selecione um responsável</option>';
-  dados.forEach(f => {
+  operacionais.forEach(f => {
     selectResponsavel.innerHTML += `<option value="${f.nome}">${f.nome}</option>`;
   });
 }
+
 
 async function carregarBlocos() {
   const res = await fetch("http://localhost:3000/api/blocos/listarBlocos");

@@ -12,7 +12,7 @@
 <!-- Top bar / Navbar -->
 <div class="nav-bar">
   <button class="menu-toggle" id="menu-toggle-btn">☰</button>
-
+  
   <div class="nav-links" id="nav-links">
     <a href="./controle-estoque.html" class="nav-link">Controle de Estoque</a>
     <a href="./historico.html" class="nav-link">Histórico Semanal</a>
@@ -25,42 +25,40 @@
 </div>
 
 
+<!-- Container principal -->
+<div class="main-wrapper">
+  <div class="main-container">
 
-  <!-- Container principal -->
-  <div class="main-wrapper">
-    <div class="main-container">
-
-      <!-- Lista lateral esquerda -->
-      <div class="w-100 w-md-50">
-        <div class="card card-full-height">
-          <div class="date-header">25/04/2025</div>
-          <div class="p-2 overflow-auto" id="lista-agendamentos"></div>
-        </div>
+    <!-- Lista lateral esquerda -->
+    <div class="w-100 w-md-50">
+      <div class="card card-full-height">
+        <div class="date-header">25/04/2025</div>
+        <div class="p-2 overflow-auto" id="lista-agendamentos"></div>
       </div>
-
-      <!-- Detalhes à direita -->
-      <div class="w-100 w-md-50">
-        <div class="card card-full-height">
-        <div id="titulo-tarefa" class="section-title">Limpeza Banheiros</div>
-          <div class="card-body">
-            <form>
-              <div class="mb-2">
-                <input type="text" class="form-control" value="Maria Antônia de Freitas" readonly>
-              </div>
-              <div class="d-flex gap-2 mb-2">
-                <input type="text" class="form-control" value="08:30" readonly>
-                <input type="text" class="form-control" value="Bloco A" readonly>
-              </div>
-              <label class="form-label">Descrição</label>
-              <textarea class="form-control mb-3" rows="5" disabled style="pointer-events: none;"></textarea>
-
-            </form>
-          </div>
-        </div>
-      </div>
-
     </div>
+
+    <!-- Detalhes à direita -->
+    <div class="w-100 w-md-50">
+      <div class="card card-full-height">
+        <div id="titulo-tarefa" class="section-title">Limpeza Banheiros</div>
+        <div class="card-body">
+          <form>
+            <div class="mb-2">
+              <input type="text" class="form-control" value="Maria Antônia de Freitas" readonly>
+            </div>
+            <div class="d-flex gap-2 mb-2">
+              <input type="text" class="form-control" value="08:30" readonly>
+              <input type="text" class="form-control" value="Bloco A" readonly>
+            </div>
+            <label class="form-label">Descrição</label>
+            <textarea class="form-control mb-3" rows="5" disabled style="pointer-events: none;"></textarea>
+          </form>
+        </div>
+      </div>
+    </div>
+
   </div>
+</div>
 
   <script type="module" src="../assets/js/home-gerente.js"></script>
 </body>

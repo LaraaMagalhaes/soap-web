@@ -33,12 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
       erroDiv.style.display = 'none';
 
 
-      if (tipoUsuario === 'gerente') {
+      if (tipoUsuario === 'gerente' || tipoUsuario === 'supervisor') {
         window.location.href = '/public/home-gerente.html';
       } else {
         window.location.href = '/public/home.html';
       }
-
+      
     } catch (error){
       console.error('Erro no login: ', error)
       erroDiv.style.display = 'block';

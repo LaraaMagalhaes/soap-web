@@ -124,6 +124,21 @@ async function enviarProdutos() {
 
     exibirMensagem('✅ Pedido enviado com sucesso!', 'success');
 
+    for (const produto of produtosParaEnviar) {
+      await fetch('http://localhost:3000/api/produtos/atualizarEstoque', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          nome: produto.nome,
+          quantidade: -1 
+        })
+      });
+    }
+
+
+    await buscarProdutos();
+
     document.querySelectorAll('.product-card.selected').forEach(card => {
       card.classList.remove('selected');
     });
@@ -135,6 +150,7 @@ async function enviarProdutos() {
     exibirMensagem('Erro de conexão ao enviar pedido.', 'danger');
   }
 }
+
 
 // ======================= UTILIDADE: MENSAGEM =======================
 function exibirMensagem(texto, tipo = 'success') {
